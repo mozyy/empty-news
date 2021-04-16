@@ -6,7 +6,6 @@ package news
 import (
 	fmt "fmt"
 	proto "github.com/golang/protobuf/proto"
-	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	math "math"
 )
 
@@ -43,11 +42,8 @@ func NewNewsEndpoints() []*api.Endpoint {
 // Client API for News service
 
 type NewsService interface {
-	News(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (News_NewsService, error)
-	NewsList(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (*NewsResponse, error)
-	Call(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
-	Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (News_StreamService, error)
-	PingPong(ctx context.Context, opts ...client.CallOption) (News_PingPongService, error)
+	News(ctx context.Context, in *EmptyMsg, opts ...client.CallOption) (News_NewsService, error)
+	NewsList(ctx context.Context, in *EmptyMsg, opts ...client.CallOption) (*NewsResponse, error)
 }
 
 type newsService struct {
@@ -62,8 +58,8 @@ func NewNewsService(name string, c client.Client) NewsService {
 	}
 }
 
-func (c *newsService) News(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (News_NewsService, error) {
-	req := c.c.NewRequest(c.name, "News.News", &emptypb.Empty{})
+func (c *newsService) News(ctx context.Context, in *EmptyMsg, opts ...client.CallOption) (News_NewsService, error) {
+	req := c.c.NewRequest(c.name, "News.News", &EmptyMsg{})
 	stream, err := c.c.Stream(ctx, req, opts...)
 	if err != nil {
 		return nil, err
@@ -111,7 +107,7 @@ func (x *newsServiceNews) Recv() (*NewsItem, error) {
 	return m, nil
 }
 
-func (c *newsService) NewsList(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (*NewsResponse, error) {
+func (c *newsService) NewsList(ctx context.Context, in *EmptyMsg, opts ...client.CallOption) (*NewsResponse, error) {
 	req := c.c.NewRequest(c.name, "News.NewsList", in)
 	out := new(NewsResponse)
 	err := c.c.Call(ctx, req, out, opts...)
@@ -121,133 +117,17 @@ func (c *newsService) NewsList(ctx context.Context, in *emptypb.Empty, opts ...c
 	return out, nil
 }
 
-func (c *newsService) Call(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.name, "News.Call", in)
-	out := new(Response)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *newsService) Stream(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (News_StreamService, error) {
-	req := c.c.NewRequest(c.name, "News.Stream", &StreamingRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &newsServiceStream{stream}, nil
-}
-
-type News_StreamService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*StreamingResponse, error)
-}
-
-type newsServiceStream struct {
-	stream client.Stream
-}
-
-func (x *newsServiceStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *newsServiceStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *newsServiceStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *newsServiceStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *newsServiceStream) Recv() (*StreamingResponse, error) {
-	m := new(StreamingResponse)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *newsService) PingPong(ctx context.Context, opts ...client.CallOption) (News_PingPongService, error) {
-	req := c.c.NewRequest(c.name, "News.PingPong", &Ping{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &newsServicePingPong{stream}, nil
-}
-
-type News_PingPongService interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Ping) error
-	Recv() (*Pong, error)
-}
-
-type newsServicePingPong struct {
-	stream client.Stream
-}
-
-func (x *newsServicePingPong) Close() error {
-	return x.stream.Close()
-}
-
-func (x *newsServicePingPong) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *newsServicePingPong) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *newsServicePingPong) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *newsServicePingPong) Send(m *Ping) error {
-	return x.stream.Send(m)
-}
-
-func (x *newsServicePingPong) Recv() (*Pong, error) {
-	m := new(Pong)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
 // Server API for News service
 
 type NewsHandler interface {
-	News(context.Context, *emptypb.Empty, News_NewsStream) error
-	NewsList(context.Context, *emptypb.Empty, *NewsResponse) error
-	Call(context.Context, *Request, *Response) error
-	Stream(context.Context, *StreamingRequest, News_StreamStream) error
-	PingPong(context.Context, News_PingPongStream) error
+	News(context.Context, *EmptyMsg, News_NewsStream) error
+	NewsList(context.Context, *EmptyMsg, *NewsResponse) error
 }
 
 func RegisterNewsHandler(s server.Server, hdlr NewsHandler, opts ...server.HandlerOption) error {
 	type news interface {
 		News(ctx context.Context, stream server.Stream) error
-		NewsList(ctx context.Context, in *emptypb.Empty, out *NewsResponse) error
-		Call(ctx context.Context, in *Request, out *Response) error
-		Stream(ctx context.Context, stream server.Stream) error
-		PingPong(ctx context.Context, stream server.Stream) error
+		NewsList(ctx context.Context, in *EmptyMsg, out *NewsResponse) error
 	}
 	type News struct {
 		news
@@ -261,7 +141,7 @@ type newsHandler struct {
 }
 
 func (h *newsHandler) News(ctx context.Context, stream server.Stream) error {
-	m := new(emptypb.Empty)
+	m := new(EmptyMsg)
 	if err := stream.Recv(m); err != nil {
 		return err
 	}
@@ -300,454 +180,6 @@ func (x *newsNewsStream) Send(m *NewsItem) error {
 	return x.stream.Send(m)
 }
 
-func (h *newsHandler) NewsList(ctx context.Context, in *emptypb.Empty, out *NewsResponse) error {
+func (h *newsHandler) NewsList(ctx context.Context, in *EmptyMsg, out *NewsResponse) error {
 	return h.NewsHandler.NewsList(ctx, in, out)
-}
-
-func (h *newsHandler) Call(ctx context.Context, in *Request, out *Response) error {
-	return h.NewsHandler.Call(ctx, in, out)
-}
-
-func (h *newsHandler) Stream(ctx context.Context, stream server.Stream) error {
-	m := new(StreamingRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.NewsHandler.Stream(ctx, m, &newsStreamStream{stream})
-}
-
-type News_StreamStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*StreamingResponse) error
-}
-
-type newsStreamStream struct {
-	stream server.Stream
-}
-
-func (x *newsStreamStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *newsStreamStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *newsStreamStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *newsStreamStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *newsStreamStream) Send(m *StreamingResponse) error {
-	return x.stream.Send(m)
-}
-
-func (h *newsHandler) PingPong(ctx context.Context, stream server.Stream) error {
-	return h.NewsHandler.PingPong(ctx, &newsPingPongStream{stream})
-}
-
-type News_PingPongStream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Pong) error
-	Recv() (*Ping, error)
-}
-
-type newsPingPongStream struct {
-	stream server.Stream
-}
-
-func (x *newsPingPongStream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *newsPingPongStream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *newsPingPongStream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *newsPingPongStream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *newsPingPongStream) Send(m *Pong) error {
-	return x.stream.Send(m)
-}
-
-func (x *newsPingPongStream) Recv() (*Ping, error) {
-	m := new(Ping)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// Api Endpoints for Empty service
-
-func NewEmptyEndpoints() []*api.Endpoint {
-	return []*api.Endpoint{}
-}
-
-// Client API for Empty service
-
-type EmptyService interface {
-	News2(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (Empty_News2Service, error)
-	NewsList2(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (*NewsResponse, error)
-	Call2(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error)
-	Stream2(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (Empty_Stream2Service, error)
-	PingPong2(ctx context.Context, opts ...client.CallOption) (Empty_PingPong2Service, error)
-}
-
-type emptyService struct {
-	c    client.Client
-	name string
-}
-
-func NewEmptyService(name string, c client.Client) EmptyService {
-	return &emptyService{
-		c:    c,
-		name: name,
-	}
-}
-
-func (c *emptyService) News2(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (Empty_News2Service, error) {
-	req := c.c.NewRequest(c.name, "Empty.News2", &emptypb.Empty{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &emptyServiceNews2{stream}, nil
-}
-
-type Empty_News2Service interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*NewsItem, error)
-}
-
-type emptyServiceNews2 struct {
-	stream client.Stream
-}
-
-func (x *emptyServiceNews2) Close() error {
-	return x.stream.Close()
-}
-
-func (x *emptyServiceNews2) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *emptyServiceNews2) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyServiceNews2) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *emptyServiceNews2) Recv() (*NewsItem, error) {
-	m := new(NewsItem)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *emptyService) NewsList2(ctx context.Context, in *emptypb.Empty, opts ...client.CallOption) (*NewsResponse, error) {
-	req := c.c.NewRequest(c.name, "Empty.NewsList2", in)
-	out := new(NewsResponse)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *emptyService) Call2(ctx context.Context, in *Request, opts ...client.CallOption) (*Response, error) {
-	req := c.c.NewRequest(c.name, "Empty.Call2", in)
-	out := new(Response)
-	err := c.c.Call(ctx, req, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *emptyService) Stream2(ctx context.Context, in *StreamingRequest, opts ...client.CallOption) (Empty_Stream2Service, error) {
-	req := c.c.NewRequest(c.name, "Empty.Stream2", &StreamingRequest{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	if err := stream.Send(in); err != nil {
-		return nil, err
-	}
-	return &emptyServiceStream2{stream}, nil
-}
-
-type Empty_Stream2Service interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Recv() (*StreamingResponse, error)
-}
-
-type emptyServiceStream2 struct {
-	stream client.Stream
-}
-
-func (x *emptyServiceStream2) Close() error {
-	return x.stream.Close()
-}
-
-func (x *emptyServiceStream2) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *emptyServiceStream2) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyServiceStream2) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *emptyServiceStream2) Recv() (*StreamingResponse, error) {
-	m := new(StreamingResponse)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *emptyService) PingPong2(ctx context.Context, opts ...client.CallOption) (Empty_PingPong2Service, error) {
-	req := c.c.NewRequest(c.name, "Empty.PingPong2", &Ping{})
-	stream, err := c.c.Stream(ctx, req, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &emptyServicePingPong2{stream}, nil
-}
-
-type Empty_PingPong2Service interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Ping) error
-	Recv() (*Pong, error)
-}
-
-type emptyServicePingPong2 struct {
-	stream client.Stream
-}
-
-func (x *emptyServicePingPong2) Close() error {
-	return x.stream.Close()
-}
-
-func (x *emptyServicePingPong2) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *emptyServicePingPong2) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyServicePingPong2) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *emptyServicePingPong2) Send(m *Ping) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyServicePingPong2) Recv() (*Pong, error) {
-	m := new(Pong)
-	err := x.stream.Recv(m)
-	if err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// Server API for Empty service
-
-type EmptyHandler interface {
-	News2(context.Context, *emptypb.Empty, Empty_News2Stream) error
-	NewsList2(context.Context, *emptypb.Empty, *NewsResponse) error
-	Call2(context.Context, *Request, *Response) error
-	Stream2(context.Context, *StreamingRequest, Empty_Stream2Stream) error
-	PingPong2(context.Context, Empty_PingPong2Stream) error
-}
-
-func RegisterEmptyHandler(s server.Server, hdlr EmptyHandler, opts ...server.HandlerOption) error {
-	type empty interface {
-		News2(ctx context.Context, stream server.Stream) error
-		NewsList2(ctx context.Context, in *emptypb.Empty, out *NewsResponse) error
-		Call2(ctx context.Context, in *Request, out *Response) error
-		Stream2(ctx context.Context, stream server.Stream) error
-		PingPong2(ctx context.Context, stream server.Stream) error
-	}
-	type Empty struct {
-		empty
-	}
-	h := &emptyHandler{hdlr}
-	return s.Handle(s.NewHandler(&Empty{h}, opts...))
-}
-
-type emptyHandler struct {
-	EmptyHandler
-}
-
-func (h *emptyHandler) News2(ctx context.Context, stream server.Stream) error {
-	m := new(emptypb.Empty)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.EmptyHandler.News2(ctx, m, &emptyNews2Stream{stream})
-}
-
-type Empty_News2Stream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*NewsItem) error
-}
-
-type emptyNews2Stream struct {
-	stream server.Stream
-}
-
-func (x *emptyNews2Stream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *emptyNews2Stream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *emptyNews2Stream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyNews2Stream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *emptyNews2Stream) Send(m *NewsItem) error {
-	return x.stream.Send(m)
-}
-
-func (h *emptyHandler) NewsList2(ctx context.Context, in *emptypb.Empty, out *NewsResponse) error {
-	return h.EmptyHandler.NewsList2(ctx, in, out)
-}
-
-func (h *emptyHandler) Call2(ctx context.Context, in *Request, out *Response) error {
-	return h.EmptyHandler.Call2(ctx, in, out)
-}
-
-func (h *emptyHandler) Stream2(ctx context.Context, stream server.Stream) error {
-	m := new(StreamingRequest)
-	if err := stream.Recv(m); err != nil {
-		return err
-	}
-	return h.EmptyHandler.Stream2(ctx, m, &emptyStream2Stream{stream})
-}
-
-type Empty_Stream2Stream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*StreamingResponse) error
-}
-
-type emptyStream2Stream struct {
-	stream server.Stream
-}
-
-func (x *emptyStream2Stream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *emptyStream2Stream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *emptyStream2Stream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyStream2Stream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *emptyStream2Stream) Send(m *StreamingResponse) error {
-	return x.stream.Send(m)
-}
-
-func (h *emptyHandler) PingPong2(ctx context.Context, stream server.Stream) error {
-	return h.EmptyHandler.PingPong2(ctx, &emptyPingPong2Stream{stream})
-}
-
-type Empty_PingPong2Stream interface {
-	Context() context.Context
-	SendMsg(interface{}) error
-	RecvMsg(interface{}) error
-	Close() error
-	Send(*Pong) error
-	Recv() (*Ping, error)
-}
-
-type emptyPingPong2Stream struct {
-	stream server.Stream
-}
-
-func (x *emptyPingPong2Stream) Close() error {
-	return x.stream.Close()
-}
-
-func (x *emptyPingPong2Stream) Context() context.Context {
-	return x.stream.Context()
-}
-
-func (x *emptyPingPong2Stream) SendMsg(m interface{}) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyPingPong2Stream) RecvMsg(m interface{}) error {
-	return x.stream.Recv(m)
-}
-
-func (x *emptyPingPong2Stream) Send(m *Pong) error {
-	return x.stream.Send(m)
-}
-
-func (x *emptyPingPong2Stream) Recv() (*Ping, error) {
-	m := new(Ping)
-	if err := x.stream.Recv(m); err != nil {
-		return nil, err
-	}
-	return m, nil
 }
