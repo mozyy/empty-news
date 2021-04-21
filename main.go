@@ -3,7 +3,7 @@ package main
 import (
 	"empty/handler"
 
-	pb "empty/proto"
+	pb "empty/proto/news"
 
 	"github.com/micro/micro/v3/service"
 	"github.com/micro/micro/v3/service/logger"
@@ -12,12 +12,12 @@ import (
 func main() {
 	// Create service
 	srv := service.New(
-		service.Name("empty"),
+		service.Name("news.News"),
 		service.Version("latest"),
 	)
 
 	// Register handler
-	pb.RegisterEmptyHandler(srv.Server(), new(handler.Empty))
+	pb.RegisterNewsHandler(srv.Server(), new(handler.NewsStruct))
 
 	// Run service
 	if err := srv.Run(); err != nil {
