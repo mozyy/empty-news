@@ -1,7 +1,7 @@
 package crawler
 
 import (
-	pb "empty/proto/news"
+	pb "empty-news/proto/news"
 	"errors"
 	"strconv"
 	"strings"

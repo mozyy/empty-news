@@ -1,28 +1,36 @@
 package main
 
 import (
-	"empty/handler"
+	"empty-news/handler"
+	"fmt"
+	"log"
+	"net"
 
-	pb "empty/proto/news"
+	pb "empty-news/proto/news"
 
-	"github.com/micro/micro/v3/service"
-	"github.com/micro/micro/v3/service/logger"
+	"google.golang.org/grpc"
 )
 
 func main() {
 	// Create service
-	srv := service.New(
-		service.Name("news.News"),
-		service.Version("latest"),
-	)
-
-	// Register handler
-	pb.RegisterNewsHandler(srv.Server(), new(handler.NewsStruct))
-
-	// Run service
-	if err := srv.Run(); err != nil {
-		logger.Fatal(err)
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 50051))
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
 	}
+
+	grpcServer := grpc.NewServer()
+	// Register handler
+	pb.RegisterNewsServer(grpcServer, new(handler.NewsStruct))
+	log.Printf("starting")
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %s", err)
+	} else {
+		log.Printf("Server started successfully")
+	}
+	// Run service
+	// if err := srv.Run(); err != nil {
+	// 	logger.Fatal(err)
+	// }
 	// crawler.News(func(list []*empty.NewsItem) {
 	// 	fmt.Println("123123")
 	// 	fmt.Println(list)
