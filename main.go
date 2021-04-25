@@ -11,9 +11,13 @@ import (
 	"google.golang.org/grpc"
 )
 
+const (
+	prot = 50051
+)
+
 func main() {
 	// Create service
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", 50051))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", prot))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
