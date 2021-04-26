@@ -1,12 +1,12 @@
 package main
 
 import (
-	"empty-news/handler"
 	"fmt"
+	"github.com/mozyy/empty-news/handler"
 	"log"
 	"net"
 
-	pb "empty-news/proto/news"
+	pb "github.com/mozyy/empty-news/proto/news"
 
 	"google.golang.org/grpc"
 )

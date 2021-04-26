@@ -21,7 +21,7 @@ package main
 
 import (
 	"context"
-	"empty-news/proto/news"
+	"github.com/mozyy/empty-news/proto/news"
 	"log"
 	"time"
 

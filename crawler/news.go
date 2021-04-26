@@ -1,8 +1,8 @@
 package crawler
 
 import (
-	pb "empty-news/proto/news"
 	"errors"
+	pb "github.com/mozyy/empty-news/proto/news"
 	"strconv"
 	"strings"
 

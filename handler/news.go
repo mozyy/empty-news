@@ -5,8 +5,8 @@ import (
 
 	log "github.com/micro/micro/v3/service/logger"
 
-	"empty-news/crawler"
-	empty "empty-news/proto/news"
+	"github.com/mozyy/empty-news/crawler"
+	empty "github.com/mozyy/empty-news/proto/news"
 )
 
 type NewsStruct struct{}

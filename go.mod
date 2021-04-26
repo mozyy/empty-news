@@ -1,4 +1,4 @@
-module empty-news
+module github.com/mozyy/empty-news
 
 go 1.15
 
