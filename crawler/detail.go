@@ -1,55 +1,36 @@
 package crawler
 
 import (
-	"encoding/json"
-	"os"
-
 	"github.com/gocolly/colly"
+	pb "github.com/mozyy/empty-news/proto/news"
 )
 
-type Content struct {
-	Type    int    `json:"type,omitempty"`
-	Content string `json:"content,omitempty"`
-}
-
-type NewsDetail struct {
-	Title   string    `json:"title,omitempty"`
-	From    string    `json:"from,omitempty"`
-	Time    string    `json:"time,omitempty"`
-	Summary string    `json:"summary,omitempty"`
-	Content []Content `json:"content,omitempty"`
-}
-
 // Detail get news detail
-func Detail(url string) {
+func Detail(url string) (response *pb.DetailResponse, err error) {
 	c := colly.NewCollector(
 	// colly.AllowedDomains("cnbeta.com"),
 	)
 	c.OnHTML("body", func(e *colly.HTMLElement) {
-		content := make([]Content, 0)
+		contents := make([]*pb.DetailContent, 0)
 		e.ForEach(".articleCont > p", func(_ int, el *colly.HTMLElement) {
 			img := el.ChildAttr("img[src]", "src")
-			// if img == "" && el.Text == "" {
-			// 	return
-			// }
 			if img != "" {
-				content = append(content, Content{2, img})
+				contents = append(contents, &pb.DetailContent{Type: 2, Content: img})
 			} else {
-				content = append(content, Content{1, el.Text})
+				contents = append(contents, &pb.DetailContent{Type: 1, Content: el.Text})
 			}
 		})
-		detail := NewsDetail{
-			e.ChildText(".article-tit"),
-			e.ChildText(".article-byline > span"),
-			e.ChildText(".article-byline > .time"),
-			e.ChildText(".article-summ > p"),
-			content,
+		response = &pb.DetailResponse{
+			Title:   e.ChildText(".article-tit"),
+			From:    e.ChildText(".article-byline > span"),
+			Time:    e.ChildText(".article-byline > .time"),
+			Summary: e.ChildText(".article-summ > p"),
+			Content: contents,
 		}
-		// fmt.Println(detail)
-		enc := json.NewEncoder(os.Stdout)
-		enc.SetIndent("", "  ")
-
-		enc.Encode(detail)
+	})
+	c.OnError(func(res *colly.Response, e error) {
+		err = e
 	})
 	c.Visit(url)
+	return
 }

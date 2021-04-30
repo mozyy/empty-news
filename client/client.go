@@ -21,15 +21,17 @@ package main
 
 import (
 	"context"
-	"github.com/mozyy/empty-news/proto/news"
 	"log"
 	"time"
 
+	"github.com/mozyy/empty-news/proto/news"
+
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 const (
-	address = "https://yyue.vip"
+	address = "localhost:50051"
 )
 
 func main() {
@@ -43,9 +45,15 @@ func main() {
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
-	r, err := c.NewsList(ctx, new(news.EmptyMsg))
+	r, err := c.List(ctx, new(emptypb.Empty))
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
 	}
-	log.Printf("Greeting: %s", r.List)
+	log.Printf("list: %s", r.GetList())
+	detail, err := c.Detail(ctx, &news.DetailRequest{URL: r.GetList()[0].Link})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+	log.Printf("detail: %s", detail)
+
 }
