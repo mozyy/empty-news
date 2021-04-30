@@ -13,6 +13,7 @@ import (
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	reflect "reflect"
 	sync "sync"
 )
@@ -23,138 +24,6 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
-
-type EmptyMsg struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *EmptyMsg) Reset() {
-	*x = EmptyMsg{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[0]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *EmptyMsg) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*EmptyMsg) ProtoMessage() {}
-
-func (x *EmptyMsg) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[0]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use EmptyMsg.ProtoReflect.Descriptor instead.
-func (*EmptyMsg) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{0}
-}
-
-type HelloRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *HelloRequest) Reset() {
-	*x = HelloRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[1]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HelloRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HelloRequest) ProtoMessage() {}
-
-func (x *HelloRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[1]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HelloRequest.ProtoReflect.Descriptor instead.
-func (*HelloRequest) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *HelloRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-type HelloResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *HelloResponse) Reset() {
-	*x = HelloResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HelloResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HelloResponse) ProtoMessage() {}
-
-func (x *HelloResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HelloResponse.ProtoReflect.Descriptor instead.
-func (*HelloResponse) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *HelloResponse) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
 
 type NewsItem struct {
 	state         protoimpl.MessageState
@@ -173,7 +42,7 @@ type NewsItem struct {
 func (x *NewsItem) Reset() {
 	*x = NewsItem{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[3]
+		mi := &file_news_news_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -186,7 +55,7 @@ func (x *NewsItem) String() string {
 func (*NewsItem) ProtoMessage() {}
 
 func (x *NewsItem) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[3]
+	mi := &file_news_news_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -199,7 +68,7 @@ func (x *NewsItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NewsItem.ProtoReflect.Descriptor instead.
 func (*NewsItem) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{3}
+	return file_news_news_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *NewsItem) GetLink() string {
@@ -251,7 +120,7 @@ func (x *NewsItem) GetType() string {
 	return ""
 }
 
-type NewsResponse struct {
+type ListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
@@ -259,104 +128,10 @@ type NewsResponse struct {
 	List []*NewsItem `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
 }
 
-func (x *NewsResponse) Reset() {
-	*x = NewsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *NewsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*NewsResponse) ProtoMessage() {}
-
-func (x *NewsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use NewsResponse.ProtoReflect.Descriptor instead.
-func (*NewsResponse) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *NewsResponse) GetList() []*NewsItem {
-	if x != nil {
-		return x.List
-	}
-	return nil
-}
-
-type ListRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-}
-
-func (x *ListRequest) Reset() {
-	*x = ListRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *ListRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ListRequest) ProtoMessage() {}
-
-func (x *ListRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ListRequest.ProtoReflect.Descriptor instead.
-func (*ListRequest) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *ListRequest) GetName() string {
-	if x != nil {
-		return x.Name
-	}
-	return ""
-}
-
-type ListResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Msg string `protobuf:"bytes,1,opt,name=msg,proto3" json:"msg,omitempty"`
-}
-
 func (x *ListResponse) Reset() {
 	*x = ListResponse{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_news_news_proto_msgTypes[6]
+		mi := &file_news_news_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -369,7 +144,7 @@ func (x *ListResponse) String() string {
 func (*ListResponse) ProtoMessage() {}
 
 func (x *ListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_news_news_proto_msgTypes[6]
+	mi := &file_news_news_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -382,56 +157,243 @@ func (x *ListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListResponse.ProtoReflect.Descriptor instead.
 func (*ListResponse) Descriptor() ([]byte, []int) {
-	return file_news_news_proto_rawDescGZIP(), []int{6}
+	return file_news_news_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ListResponse) GetMsg() string {
+func (x *ListResponse) GetList() []*NewsItem {
 	if x != nil {
-		return x.Msg
+		return x.List
+	}
+	return nil
+}
+
+type DetailRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+}
+
+func (x *DetailRequest) Reset() {
+	*x = DetailRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_news_news_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DetailRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetailRequest) ProtoMessage() {}
+
+func (x *DetailRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_news_news_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetailRequest.ProtoReflect.Descriptor instead.
+func (*DetailRequest) Descriptor() ([]byte, []int) {
+	return file_news_news_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *DetailRequest) GetUrl() string {
+	if x != nil {
+		return x.Url
 	}
 	return ""
+}
+
+type DetailContent struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Type    int32  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
+	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *DetailContent) Reset() {
+	*x = DetailContent{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_news_news_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DetailContent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetailContent) ProtoMessage() {}
+
+func (x *DetailContent) ProtoReflect() protoreflect.Message {
+	mi := &file_news_news_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetailContent.ProtoReflect.Descriptor instead.
+func (*DetailContent) Descriptor() ([]byte, []int) {
+	return file_news_news_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *DetailContent) GetType() int32 {
+	if x != nil {
+		return x.Type
+	}
+	return 0
+}
+
+func (x *DetailContent) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+type DetailResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Title   string           `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	From    string           `protobuf:"bytes,2,opt,name=from,proto3" json:"from,omitempty"`
+	Time    string           `protobuf:"bytes,3,opt,name=time,proto3" json:"time,omitempty"`
+	Summary string           `protobuf:"bytes,4,opt,name=summary,proto3" json:"summary,omitempty"`
+	Content []*DetailContent `protobuf:"bytes,5,rep,name=content,proto3" json:"content,omitempty"`
+}
+
+func (x *DetailResponse) Reset() {
+	*x = DetailResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_news_news_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *DetailResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DetailResponse) ProtoMessage() {}
+
+func (x *DetailResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_news_news_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DetailResponse.ProtoReflect.Descriptor instead.
+func (*DetailResponse) Descriptor() ([]byte, []int) {
+	return file_news_news_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *DetailResponse) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *DetailResponse) GetFrom() string {
+	if x != nil {
+		return x.From
+	}
+	return ""
+}
+
+func (x *DetailResponse) GetTime() string {
+	if x != nil {
+		return x.Time
+	}
+	return ""
+}
+
+func (x *DetailResponse) GetSummary() string {
+	if x != nil {
+		return x.Summary
+	}
+	return ""
+}
+
+func (x *DetailResponse) GetContent() []*DetailContent {
+	if x != nil {
+		return x.Content
+	}
+	return nil
 }
 
 var File_news_news_proto protoreflect.FileDescriptor
 
 var file_news_news_proto_rawDesc = []byte{
 	0x0a, 0x0f, 0x6e, 0x65, 0x77, 0x73, 0x2f, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x12, 0x04, 0x6e, 0x65, 0x77, 0x73, 0x22, 0x0a, 0x0a, 0x08, 0x45, 0x6d, 0x70, 0x74, 0x79,
-	0x4d, 0x73, 0x67, 0x22, 0x22, 0x0a, 0x0c, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x23, 0x0a, 0x0d, 0x48, 0x65, 0x6c, 0x6c, 0x6f,
-	0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0xa0, 0x01, 0x0a,
-	0x08, 0x4e, 0x65, 0x77, 0x73, 0x49, 0x74, 0x65, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6c, 0x69, 0x6e,
-	0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6c, 0x69, 0x6e, 0x6b, 0x12, 0x14, 0x0a,
-	0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6d,
-	0x61, 0x67, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d,
-	0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x12, 0x12, 0x0a,
-	0x04, 0x76, 0x69, 0x65, 0x77, 0x18, 0x05, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x76, 0x69, 0x65,
-	0x77, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x01,
-	0x28, 0x05, 0x52, 0x07, 0x63, 0x6f, 0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74,
-	0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22,
-	0x32, 0x0a, 0x0c, 0x4e, 0x65, 0x77, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x22, 0x0a, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e,
-	0x6e, 0x65, 0x77, 0x73, 0x2e, 0x4e, 0x65, 0x77, 0x73, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x04, 0x6c,
-	0x69, 0x73, 0x74, 0x22, 0x21, 0x0a, 0x0b, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x22, 0x20, 0x0a, 0x0c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x10, 0x0a, 0x03, 0x6d, 0x73, 0x67, 0x18, 0x01, 0x20,
-	0x01, 0x28, 0x09, 0x52, 0x03, 0x6d, 0x73, 0x67, 0x32, 0x98, 0x01, 0x0a, 0x04, 0x4e, 0x65, 0x77,
-	0x73, 0x12, 0x32, 0x0a, 0x05, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x12, 0x12, 0x2e, 0x6e, 0x65, 0x77,
-	0x73, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x13,
-	0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x2a, 0x0a, 0x04, 0x4e, 0x65, 0x77, 0x73, 0x12, 0x0e, 0x2e,
-	0x6e, 0x65, 0x77, 0x73, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x4d, 0x73, 0x67, 0x1a, 0x0e, 0x2e,
-	0x6e, 0x65, 0x77, 0x73, 0x2e, 0x4e, 0x65, 0x77, 0x73, 0x49, 0x74, 0x65, 0x6d, 0x22, 0x00, 0x30,
-	0x01, 0x12, 0x30, 0x0a, 0x08, 0x4e, 0x65, 0x77, 0x73, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x0e, 0x2e,
-	0x6e, 0x65, 0x77, 0x73, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x4d, 0x73, 0x67, 0x1a, 0x12, 0x2e,
-	0x6e, 0x65, 0x77, 0x73, 0x2e, 0x4e, 0x65, 0x77, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x22, 0x00, 0x42, 0x1c, 0x5a, 0x1a, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x2d, 0x6e, 0x65, 0x77,
-	0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x6e, 0x65, 0x77, 0x73, 0x3b, 0x6e, 0x65, 0x77,
-	0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6f, 0x12, 0x04, 0x6e, 0x65, 0x77, 0x73, 0x1a, 0x1b, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f,
+	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x22, 0xa0, 0x01, 0x0a, 0x08, 0x4e, 0x65, 0x77, 0x73, 0x49, 0x74, 0x65,
+	0x6d, 0x12, 0x12, 0x0a, 0x04, 0x6c, 0x69, 0x6e, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x6c, 0x69, 0x6e, 0x6b, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x69, 0x6d, 0x61, 0x67, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x74,
+	0x69, 0x74, 0x6c, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x74, 0x69, 0x74, 0x6c,
+	0x65, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x74, 0x69, 0x6d, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x76, 0x69, 0x65, 0x77, 0x18, 0x05, 0x20,
+	0x01, 0x28, 0x05, 0x52, 0x04, 0x76, 0x69, 0x65, 0x77, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6d,
+	0x6d, 0x65, 0x6e, 0x74, 0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x63, 0x6f, 0x6d, 0x6d,
+	0x65, 0x6e, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x22, 0x32, 0x0a, 0x0c, 0x4c, 0x69, 0x73, 0x74, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x22, 0x0a, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x18,
+	0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x4e, 0x65, 0x77,
+	0x73, 0x49, 0x74, 0x65, 0x6d, 0x52, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x22, 0x21, 0x0a, 0x0d, 0x44,
+	0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03,
+	0x75, 0x72, 0x6c, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x75, 0x72, 0x6c, 0x22, 0x3d,
+	0x0a, 0x0d, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12,
+	0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x04, 0x74,
+	0x79, 0x70, 0x65, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x97, 0x01,
+	0x0a, 0x0e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x12, 0x14, 0x0a, 0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x05, 0x74, 0x69, 0x74, 0x6c, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x66, 0x72, 0x6f, 0x6d, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x69,
+	0x6d, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x12, 0x18,
+	0x0a, 0x07, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x07, 0x73, 0x75, 0x6d, 0x6d, 0x61, 0x72, 0x79, 0x12, 0x2d, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74,
+	0x65, 0x6e, 0x74, 0x18, 0x05, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x6e, 0x65, 0x77, 0x73,
+	0x2e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x07,
+	0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x32, 0x73, 0x0a, 0x04, 0x4e, 0x65, 0x77, 0x73, 0x12,
+	0x34, 0x0a, 0x04, 0x4c, 0x69, 0x73, 0x74, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a,
+	0x12, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x35, 0x0a, 0x06, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x12,
+	0x13, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x1a, 0x14, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x44, 0x65, 0x74, 0x61,
+	0x69, 0x6c, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x1c, 0x5a, 0x1a,
+	0x65, 0x6d, 0x70, 0x74, 0x79, 0x2d, 0x6e, 0x65, 0x77, 0x73, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x2f, 0x6e, 0x65, 0x77, 0x73, 0x3b, 0x6e, 0x65, 0x77, 0x73, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -446,29 +408,27 @@ func file_news_news_proto_rawDescGZIP() []byte {
 	return file_news_news_proto_rawDescData
 }
 
-var file_news_news_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_news_news_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_news_news_proto_goTypes = []interface{}{
-	(*EmptyMsg)(nil),      // 0: news.EmptyMsg
-	(*HelloRequest)(nil),  // 1: news.HelloRequest
-	(*HelloResponse)(nil), // 2: news.HelloResponse
-	(*NewsItem)(nil),      // 3: news.NewsItem
-	(*NewsResponse)(nil),  // 4: news.NewsResponse
-	(*ListRequest)(nil),   // 5: news.ListRequest
-	(*ListResponse)(nil),  // 6: news.ListResponse
+	(*NewsItem)(nil),       // 0: news.NewsItem
+	(*ListResponse)(nil),   // 1: news.ListResponse
+	(*DetailRequest)(nil),  // 2: news.DetailRequest
+	(*DetailContent)(nil),  // 3: news.DetailContent
+	(*DetailResponse)(nil), // 4: news.DetailResponse
+	(*emptypb.Empty)(nil),  // 5: google.protobuf.Empty
 }
 var file_news_news_proto_depIdxs = []int32{
-	3, // 0: news.NewsResponse.list:type_name -> news.NewsItem
-	1, // 1: news.News.Hello:input_type -> news.HelloRequest
-	0, // 2: news.News.News:input_type -> news.EmptyMsg
-	0, // 3: news.News.NewsList:input_type -> news.EmptyMsg
-	2, // 4: news.News.Hello:output_type -> news.HelloResponse
-	3, // 5: news.News.News:output_type -> news.NewsItem
-	4, // 6: news.News.NewsList:output_type -> news.NewsResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // 0: news.ListResponse.list:type_name -> news.NewsItem
+	3, // 1: news.DetailResponse.content:type_name -> news.DetailContent
+	5, // 2: news.News.List:input_type -> google.protobuf.Empty
+	2, // 3: news.News.Detail:input_type -> news.DetailRequest
+	1, // 4: news.News.List:output_type -> news.ListResponse
+	4, // 5: news.News.Detail:output_type -> news.DetailResponse
+	4, // [4:6] is the sub-list for method output_type
+	2, // [2:4] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_news_news_proto_init() }
@@ -478,42 +438,6 @@ func file_news_news_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_news_news_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*EmptyMsg); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_news_news_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HelloRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_news_news_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HelloResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_news_news_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*NewsItem); i {
 			case 0:
 				return &v.state
@@ -525,32 +449,44 @@ func file_news_news_proto_init() {
 				return nil
 			}
 		}
-		file_news_news_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*NewsResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_news_news_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ListRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_news_news_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+		file_news_news_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_news_news_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DetailRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_news_news_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DetailContent); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_news_news_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*DetailResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -568,7 +504,7 @@ func file_news_news_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_news_news_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
@@ -594,9 +530,8 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NewsClient interface {
-	Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error)
-	News(ctx context.Context, in *EmptyMsg, opts ...grpc.CallOption) (News_NewsClient, error)
-	NewsList(ctx context.Context, in *EmptyMsg, opts ...grpc.CallOption) (*NewsResponse, error)
+	List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListResponse, error)
+	Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error)
 }
 
 type newsClient struct {
@@ -607,50 +542,18 @@ func NewNewsClient(cc grpc.ClientConnInterface) NewsClient {
 	return &newsClient{cc}
 }
 
-func (c *newsClient) Hello(ctx context.Context, in *HelloRequest, opts ...grpc.CallOption) (*HelloResponse, error) {
-	out := new(HelloResponse)
-	err := c.cc.Invoke(ctx, "/news.News/Hello", in, out, opts...)
+func (c *newsClient) List(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ListResponse, error) {
+	out := new(ListResponse)
+	err := c.cc.Invoke(ctx, "/news.News/List", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *newsClient) News(ctx context.Context, in *EmptyMsg, opts ...grpc.CallOption) (News_NewsClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_News_serviceDesc.Streams[0], "/news.News/News", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &newsNewsClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type News_NewsClient interface {
-	Recv() (*NewsItem, error)
-	grpc.ClientStream
-}
-
-type newsNewsClient struct {
-	grpc.ClientStream
-}
-
-func (x *newsNewsClient) Recv() (*NewsItem, error) {
-	m := new(NewsItem)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *newsClient) NewsList(ctx context.Context, in *EmptyMsg, opts ...grpc.CallOption) (*NewsResponse, error) {
-	out := new(NewsResponse)
-	err := c.cc.Invoke(ctx, "/news.News/NewsList", in, out, opts...)
+func (c *newsClient) Detail(ctx context.Context, in *DetailRequest, opts ...grpc.CallOption) (*DetailResponse, error) {
+	out := new(DetailResponse)
+	err := c.cc.Invoke(ctx, "/news.News/Detail", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -659,82 +562,57 @@ func (c *newsClient) NewsList(ctx context.Context, in *EmptyMsg, opts ...grpc.Ca
 
 // NewsServer is the server API for News service.
 type NewsServer interface {
-	Hello(context.Context, *HelloRequest) (*HelloResponse, error)
-	News(*EmptyMsg, News_NewsServer) error
-	NewsList(context.Context, *EmptyMsg) (*NewsResponse, error)
+	List(context.Context, *emptypb.Empty) (*ListResponse, error)
+	Detail(context.Context, *DetailRequest) (*DetailResponse, error)
 }
 
 // UnimplementedNewsServer can be embedded to have forward compatible implementations.
 type UnimplementedNewsServer struct {
 }
 
-func (*UnimplementedNewsServer) Hello(context.Context, *HelloRequest) (*HelloResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Hello not implemented")
+func (*UnimplementedNewsServer) List(context.Context, *emptypb.Empty) (*ListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
 }
-func (*UnimplementedNewsServer) News(*EmptyMsg, News_NewsServer) error {
-	return status.Errorf(codes.Unimplemented, "method News not implemented")
-}
-func (*UnimplementedNewsServer) NewsList(context.Context, *EmptyMsg) (*NewsResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method NewsList not implemented")
+func (*UnimplementedNewsServer) Detail(context.Context, *DetailRequest) (*DetailResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Detail not implemented")
 }
 
 func RegisterNewsServer(s *grpc.Server, srv NewsServer) {
 	s.RegisterService(&_News_serviceDesc, srv)
 }
 
-func _News_Hello_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HelloRequest)
+func _News_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NewsServer).Hello(ctx, in)
+		return srv.(NewsServer).List(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/news.News/Hello",
+		FullMethod: "/news.News/List",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).Hello(ctx, req.(*HelloRequest))
+		return srv.(NewsServer).List(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _News_News_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(EmptyMsg)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(NewsServer).News(m, &newsNewsServer{stream})
-}
-
-type News_NewsServer interface {
-	Send(*NewsItem) error
-	grpc.ServerStream
-}
-
-type newsNewsServer struct {
-	grpc.ServerStream
-}
-
-func (x *newsNewsServer) Send(m *NewsItem) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _News_NewsList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EmptyMsg)
+func _News_Detail_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DetailRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(NewsServer).NewsList(ctx, in)
+		return srv.(NewsServer).Detail(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/news.News/NewsList",
+		FullMethod: "/news.News/Detail",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(NewsServer).NewsList(ctx, req.(*EmptyMsg))
+		return srv.(NewsServer).Detail(ctx, req.(*DetailRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -744,20 +622,14 @@ var _News_serviceDesc = grpc.ServiceDesc{
 	HandlerType: (*NewsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Hello",
-			Handler:    _News_Hello_Handler,
+			MethodName: "List",
+			Handler:    _News_List_Handler,
 		},
 		{
-			MethodName: "NewsList",
-			Handler:    _News_NewsList_Handler,
+			MethodName: "Detail",
+			Handler:    _News_Detail_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "News",
-			Handler:       _News_News_Handler,
-			ServerStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "news/news.proto",
 }
