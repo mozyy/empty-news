@@ -2,15 +2,16 @@ package crawler
 
 import (
 	"errors"
-	pb "github.com/mozyy/empty-news/proto/news"
 	"strconv"
 	"strings"
+
+	pb "github.com/mozyy/empty-news/proto/news"
 
 	"github.com/gocolly/colly"
 )
 
 // News is
-func News(callback func([]*pb.NewsItem, error)) {
+func News() (items []*pb.NewsItem, err error) {
 	colletcor := colly.NewCollector(
 	// colly.AllowedDomains("cnbeta.com"),
 	)
@@ -35,13 +36,14 @@ func News(callback func([]*pb.NewsItem, error)) {
 			})
 		})
 		if len(list) == 0 {
-			callback(list, errors.New("not fund news"))
+			err = errors.New("not fund news")
 		} else {
-			callback(list, nil)
+			items = list
 		}
 	})
-	colletcor.OnError(func(e *colly.Response, err error) {
-		callback(nil, nil)
+	colletcor.OnError(func(res *colly.Response, e error) {
+		err = e
 	})
 	colletcor.Visit("https://m.cnbeta.com")
+	return
 }
