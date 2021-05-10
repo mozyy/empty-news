@@ -14,6 +14,13 @@
 	},
 	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
 
+		// Use this environment variable if you need to bind mount your local source code into a new container.
+		"remoteEnv": {
+			// "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+			"http_proxy": "${localEnv:proxy_addr}",
+			"https_proxy": "${localEnv:proxy_addr}"
+		},
+
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
 		"terminal.integrated.shell.linux": "/bin/bash",

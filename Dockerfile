@@ -17,4 +17,4 @@ COPY main .
 
 EXPOSE 50051
 
-CMD ["main"]
+CMD ["./main"]
