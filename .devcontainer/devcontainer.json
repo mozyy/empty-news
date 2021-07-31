@@ -1,46 +1,42 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
-// https://github.com/microsoft/vscode-dev-containers/tree/v0.166.1/containers/go
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.166.1/containers/docker-from-docker-compose
 {
 	"name": "Go",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"args": {
-			// Update the VARIANT arg to pick a version of Go: 1, 1.16, 1.15
-			"VARIANT": "1",
-			// Options
-			"INSTALL_NODE": "false",
-			"NODE_VERSION": "lts/*"
-		}
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "app",
+	"runServices": [
+		"empty-envoy"
+	],
+	"workspaceFolder": "/workspace",
+	// Use this environment variable if you need to bind mount your local source code into a new container.
+	"remoteEnv": {
+		// "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+		"http_proxy": "${localEnv:proxy_addr}",
+		"https_proxy": "${localEnv:proxy_addr}"
 	},
-	"runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
-
-		// Use this environment variable if you need to bind mount your local source code into a new container.
-		"remoteEnv": {
-			// "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
-			"http_proxy": "${localEnv:proxy_addr}",
-			"https_proxy": "${localEnv:proxy_addr}"
-		},
-
 	// Set *default* container specific settings.json values on container create.
 	"settings": {
-		"terminal.integrated.shell.linux": "/bin/bash",
+		"terminal.integrated.profiles.linux": {
+			"zsh (login)": {
+				"path": "zsh",
+				"args": [
+					"-l"
+				]
+			}
+		},
 		"go.toolsManagement.checkForUpdates": "local",
 		"go.useLanguageServer": true,
 		"go.gopath": "/go",
 		"go.goroot": "/usr/local/go"
 	},
-
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": [
 		"golang.Go"
 	],
-
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
-
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "go version",
-
 	// Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
 	"remoteUser": "vscode"
 }
