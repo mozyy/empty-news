@@ -10,6 +10,7 @@ require (
 	github.com/antchfx/xpath v1.2.0 // indirect
 	github.com/go-oauth2/oauth2/v4 v4.3.0
 	github.com/go-session/session v3.1.2+incompatible
+	github.com/go-sql-driver/mysql v1.6.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/gocolly/colly v1.2.0
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
