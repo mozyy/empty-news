@@ -43,7 +43,7 @@ services:
       dockerfile: Dockerfile.envoy
     ports:
       - "50052:50052"
-      - "9901:9901"
+      - "9902:9902"
 
 
 # networks:

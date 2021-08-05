@@ -12,7 +12,8 @@
 	"remoteEnv": {
 		// "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
 		"http_proxy": "${localEnv:proxy_addr}",
-		"https_proxy": "${localEnv:proxy_addr}"
+		"https_proxy": "${localEnv:proxy_addr}",
+		"mysql_dsn": "${localEnv:mysql_dsn}"
 	},
 	// Set *default* container specific settings.json values on container create.
 	"settings": {

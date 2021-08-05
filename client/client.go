@@ -47,12 +47,12 @@ func main() {
 	defer cancel()
 	r, err := c.List(ctx, new(emptypb.Empty))
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("could not greet1: %v", err)
 	}
 	log.Printf("list: %s", r.GetList())
 	detail, err := c.Detail(ctx, &news.DetailRequest{URL: r.GetList()[0].Link})
 	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+		log.Fatalf("could not greet2: %v", err)
 	}
 	log.Printf("detail: %s", detail)
 
