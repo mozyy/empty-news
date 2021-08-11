@@ -24,8 +24,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/mozyy/empty-news/proto/news"
-
+	"github.com/mozyy/empty-news/proto/pbnews"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
@@ -41,7 +40,7 @@ func main() {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := news.NewNewsClient(conn)
+	c := pbnews.NewNewsClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
@@ -50,7 +49,7 @@ func main() {
 		log.Fatalf("could not greet1: %v", err)
 	}
 	log.Printf("list: %s", r.GetList())
-	detail, err := c.Detail(ctx, &news.DetailRequest{URL: r.GetList()[0].Link})
+	detail, err := c.Detail(ctx, &pbnews.DetailRequest{URL: r.GetList()[0].Link})
 	if err != nil {
 		log.Fatalf("could not greet2: %v", err)
 	}

@@ -5,25 +5,24 @@ import (
 	"strconv"
 	"strings"
 
-	pb "github.com/mozyy/empty-news/proto/news"
-
 	"github.com/gocolly/colly"
+	"github.com/mozyy/empty-news/proto/pbnews"
 )
 
 // News is
-func News() (items []*pb.NewsItem, err error) {
+func News() (items []*pbnews.NewsItem, err error) {
 	colletcor := colly.NewCollector(
 	// colly.AllowedDomains("cnbeta.com"),
 	)
 	colletcor.OnHTML("body", func(body *colly.HTMLElement) {
-		list := make([]*pb.NewsItem, 0)
+		list := make([]*pbnews.NewsItem, 0)
 		body.ForEach(".titleAnc", func(_ int, section *colly.HTMLElement) {
 			typeStr := section.Attr("id")
 			section.ForEach("li", func(_ int, li *colly.HTMLElement) {
 				if strings.HasPrefix(li.ChildAttr(".txt_area a", "href"), "/") {
 					view, _ := strconv.Atoi(li.ChildText(".ico_view"))
 					comment, _ := strconv.Atoi(li.ChildText(".ico_comment"))
-					list = append(list, &pb.NewsItem{
+					list = append(list, &pbnews.NewsItem{
 						Link:    li.Request.AbsoluteURL(li.ChildAttr(".txt_area a", "href")),
 						Image:   li.ChildAttr("img", "src"),
 						Title:   li.ChildText(".txt_detail"),

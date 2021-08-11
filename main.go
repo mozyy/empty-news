@@ -8,10 +8,10 @@ import (
 	"net"
 	"strings"
 
-	"github.com/mozyy/empty-news/handler"
-
-	pb "github.com/mozyy/empty-news/proto/news"
-
+	"github.com/mozyy/empty-news/proto/pbnews"
+	"github.com/mozyy/empty-news/proto/pbuser"
+	"github.com/mozyy/empty-news/services/news"
+	"github.com/mozyy/empty-news/services/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -42,7 +42,9 @@ func main() {
 
 	grpcServer := grpc.NewServer(opts...)
 	// Register handler
-	pb.RegisterNewsServer(grpcServer, new(handler.NewsStruct))
+
+	register(grpcServer)
+
 	log.Printf("starting")
 	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %s", err)
@@ -79,4 +81,11 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	}
 	// Continue execution of handler after ensuring a valid token.
 	return handler(ctx, req)
+}
+
+func register(grpcServer *grpc.Server) {
+	// Register handler
+	pbnews.RegisterNewsServer(grpcServer, news.New())
+	pbuser.RegisterUserServer(grpcServer, user.New())
+	// pbuser.RegisterUserServer(grpcServer, user.Struct)
 }

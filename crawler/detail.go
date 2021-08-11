@@ -2,25 +2,25 @@ package crawler
 
 import (
 	"github.com/gocolly/colly"
-	pb "github.com/mozyy/empty-news/proto/news"
+	"github.com/mozyy/empty-news/proto/pbnews"
 )
 
 // Detail get news detail
-func Detail(url string) (response *pb.DetailResponse, err error) {
+func Detail(url string) (response *pbnews.DetailResponse, err error) {
 	c := colly.NewCollector(
 	// colly.AllowedDomains("cnbeta.com"),
 	)
 	c.OnHTML("body", func(e *colly.HTMLElement) {
-		contents := make([]*pb.DetailResponse_DetailContent, 0)
+		contents := make([]*pbnews.DetailResponse_DetailContent, 0)
 		e.ForEach(".articleCont > p", func(_ int, el *colly.HTMLElement) {
 			img := el.ChildAttr("img[src]", "src")
 			if img != "" {
-				contents = append(contents, &pb.DetailResponse_DetailContent{Type: 2, Content: img})
+				contents = append(contents, &pbnews.DetailResponse_DetailContent{Type: 2, Content: img})
 			} else {
-				contents = append(contents, &pb.DetailResponse_DetailContent{Type: 1, Content: el.Text})
+				contents = append(contents, &pbnews.DetailResponse_DetailContent{Type: 1, Content: el.Text})
 			}
 		})
-		response = &pb.DetailResponse{
+		response = &pbnews.DetailResponse{
 			Title:   e.ChildText(".article-tit"),
 			From:    e.ChildText(".article-byline > span"),
 			Time:    e.ChildText(".article-byline > .time"),
