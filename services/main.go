@@ -3,12 +3,12 @@ package main
 import (
 	"fmt"
 
-	"github.com/mozyy/empty-news/services/db"
+	"github.com/mozyy/empty-news/utils/db"
 )
 
 func main() {
 	// user := struct{id }{}
-	var Database = db.Init()
+	var Database = db.New("user")
 	// res, err := Database.Exec("INSERT user SET mobile=182813,password=123456;")
 	// checkErr(err)
 	// fmt.Println(res.RowsAffected())
