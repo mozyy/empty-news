@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4/generates"
-	oauth2store "github.com/mozyy/empty-news/oauth2/store"
+	oauth2store "github.com/mozyy/empty-news/services/oauth2/store"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"

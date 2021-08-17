@@ -16,7 +16,8 @@ import (
 )
 
 const (
-	authServerURL = "http://localhost:9096"
+	authServerURL = "http://localhost:50052/i/oauth"
+	// authServerURL = "http://localhost:9096"
 )
 
 var (
