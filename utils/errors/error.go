@@ -1,4 +1,9 @@
-package errorr
+package errors
+
+import (
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+)
 
 type Error struct {
 	name string
@@ -11,7 +16,7 @@ func New(name string) Error {
 }
 
 func (e Error) Error() string {
-	desc := e.name + ": " + e.desc
+	desc := "[" + e.name + "]: " + e.desc
 	if e.err != nil {
 		desc += "(" + e.err.Error() + ")"
 	}
@@ -24,6 +29,9 @@ func (e Error) Desc(desc string) Error {
 
 func (e Error) Err(desc string, err error) Error {
 	return Error{name: e.name, desc: desc, err: err}
+}
+func (e Error) Code(desc string, err error, code codes.Code) *status.Status {
+	return status.New(code, e.Err(desc, err).Error())
 }
 
 func (e Error) Unwrap() error {

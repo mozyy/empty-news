@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4/generates"
+	oauth2store "github.com/mozyy/empty-news/oauth2/store"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -20,6 +21,7 @@ import (
 	"github.com/go-oauth2/oauth2/v4/server"
 	"github.com/go-oauth2/oauth2/v4/store"
 	"github.com/go-session/session"
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -44,10 +46,16 @@ func main() {
 		log.Println("Dumping requests")
 	}
 	manager := manage.NewDefaultManager()
+
 	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
 
-	// token store
-	manager.MustTokenStorage(store.NewMemoryTokenStore())
+	// use mysql token store
+	// mysqlStore := mysql.NewDefaultStore(
+	// 	mysql.NewConfig(os.Getenv("mysql_dsn") + "e_user?&parseTime=true"),
+	// )
+	// manager.MapTokenStorage(mysqlStore)
+	ss := oauth2store.NewConfig(os.Getenv("mysql_dsn")+"e_user?&parseTime=true", "")
+	manager.MapTokenStorage(oauth2store.NewStore(ss, 600))
 
 	// generate jwt access token
 	// manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("00000000"), jwt.SigningMethodHS512))

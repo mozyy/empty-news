@@ -38,6 +38,7 @@ func Test_user_Register(t *testing.T) {
 		wantErr bool
 	}{
 		{"success", &pbuser.RegisterRequest{Mobile: "18381335182", Password: "yyue"}, &pbuser.LoginResponse{}, false},
+		{"success", &pbuser.RegisterRequest{Mobile: "18381335183", Password: "yyue"}, &pbuser.LoginResponse{}, false},
 	}
 
 	ctx := context.Background()
