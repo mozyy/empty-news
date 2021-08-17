@@ -53,7 +53,9 @@ func main() {
 			http.Error(w, "Code not found", http.StatusBadRequest)
 			return
 		}
+		fmt.Println(123123)
 		token, err := config.Exchange(context.Background(), code, oauth2.SetAuthURLParam("code_verifier", "s256example"))
+		fmt.Println(1231235555)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

@@ -115,6 +115,8 @@ func main() {
 			_ = dumpRequest(os.Stdout, "token", r) // Ignore the error
 		}
 
+		fmt.Println(123123)
+
 		err := srv.HandleTokenRequest(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -175,7 +177,7 @@ func userAuthorizeHandler(w http.ResponseWriter, r *http.Request) (userID string
 		store.Set("ReturnUri", r.Form)
 		store.Save()
 
-		w.Header().Set("Location", "/login")
+		w.Header().Set("Location", r.Header.Get("x-envoy-origin")+"/login")
 		w.WriteHeader(http.StatusFound)
 		return
 	}
@@ -206,7 +208,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) {
 		store.Set("LoggedInUserID", r.Form.Get("username"))
 		store.Save()
 
-		w.Header().Set("Location", "/auth")
+		w.Header().Set("Location", r.Header.Get("x-envoy-origin")+"/auth")
 		w.WriteHeader(http.StatusFound)
 		return
 	}
@@ -224,7 +226,7 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, ok := store.Get("LoggedInUserID"); !ok {
-		w.Header().Set("Location", "/login")
+		w.Header().Set("Location", r.Header.Get("x-envoy-origin")+"/login")
 		w.WriteHeader(http.StatusFound)
 		return
 	}
