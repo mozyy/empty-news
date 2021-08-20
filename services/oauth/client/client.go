@@ -16,13 +16,13 @@ import (
 )
 
 const (
-	authServerURL = "http://localhost:50052/i/oauth"
-	// authServerURL = "http://localhost:9096"
+	// authServerURL = "http://localhost:50052/i/oauth"
+	authServerURL = "http://localhost:9096"
 )
 
 var (
 	config = oauth2.Config{
-		ClientID:     "222222",
+		ClientID:     "2",
 		ClientSecret: "22222222",
 		Scopes:       []string{"all", "read"},
 		RedirectURL:  "http://localhost:9094/oauth2",
@@ -36,9 +36,11 @@ var (
 
 func main() {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		u := config.AuthCodeURL("xyz",
+		u := config.AuthCodeURL(
+			"xyz",
 			oauth2.SetAuthURLParam("code_challenge", genCodeChallengeS256("s256example")),
-			oauth2.SetAuthURLParam("code_challenge_method", "S256"))
+			oauth2.SetAuthURLParam("code_challenge_method", "S256"),
+		)
 		http.Redirect(w, r, u, http.StatusFound)
 	})
 
@@ -54,9 +56,7 @@ func main() {
 			http.Error(w, "Code not found", http.StatusBadRequest)
 			return
 		}
-		fmt.Println(123123)
 		token, err := config.Exchange(context.Background(), code, oauth2.SetAuthURLParam("code_verifier", "s256example"))
-		fmt.Println(1231235555)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return

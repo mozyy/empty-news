@@ -1,4 +1,4 @@
-package main
+package oauth
 
 import (
 	"encoding/json"
@@ -12,39 +12,33 @@ import (
 	"os"
 	"time"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/go-oauth2/oauth2/v4/generates"
-	oauth2store "github.com/mozyy/empty-news/services/oauth2/store"
+	"github.com/mozyy/empty-news/services/oauth/store"
+
+	"embed"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"
-	"github.com/go-oauth2/oauth2/v4/models"
 	"github.com/go-oauth2/oauth2/v4/server"
-	"github.com/go-oauth2/oauth2/v4/store"
 	"github.com/go-session/session"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
-	dumpvar   bool
-	idvar     string
-	secretvar string
-	domainvar string
-	portvar   int
+	dumpvar bool = true
+	portvar int  = 9096
 )
 
-func init() {
-	flag.BoolVar(&dumpvar, "d", true, "Dump requests and responses")
-	flag.StringVar(&idvar, "i", "222222", "The client id being passed in")
-	flag.StringVar(&secretvar, "s", "22222222", "The client secret being passed in")
-	flag.StringVar(&domainvar, "r", "http://localhost:9094", "The domain of the redirect url")
-	flag.IntVar(&portvar, "p", 9096, "the base port for the server")
-}
+//go:embed static/*
+var static embed.FS
 
-func main() {
+func New() {
 	flag.Parse()
 	if dumpvar {
 		log.Println("Dumping requests")
 	}
+
 	manager := manage.NewDefaultManager()
 
 	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
@@ -54,20 +48,13 @@ func main() {
 	// 	mysql.NewConfig(os.Getenv("mysql_dsn") + "e_user?&parseTime=true"),
 	// )
 	// manager.MapTokenStorage(mysqlStore)
-	ss := oauth2store.NewConfig(os.Getenv("mysql_dsn")+"e_user?&parseTime=true", "")
-	manager.MapTokenStorage(oauth2store.NewStore(ss, 600))
+	manager.MapTokenStorage(store.NewStoreToken())
 
 	// generate jwt access token
-	// manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("00000000"), jwt.SigningMethodHS512))
-	manager.MapAccessGenerate(generates.NewAccessGenerate())
+	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("00000000"), jwt.SigningMethodHS512))
+	// manager.MapAccessGenerate(generates.NewAccessGenerate())
 
-	clientStore := store.NewClientStore()
-	clientStore.Set(idvar, &models.Client{
-		ID:     idvar,
-		Secret: secretvar,
-		Domain: domainvar,
-	})
-	manager.MapClientStorage(clientStore)
+	manager.MapClientStorage(store.NewClient())
 
 	srv := server.NewServer(server.NewConfig(), manager)
 
@@ -75,6 +62,7 @@ func main() {
 		if username == "test" && password == "test" {
 			userID = "test"
 		}
+		log.Fatalln("SetPasswordAuthorizationHandler")
 		return
 	})
 
@@ -97,20 +85,22 @@ func main() {
 			dumpRequest(os.Stdout, "authorize", r)
 		}
 
-		store, err := session.Start(r.Context(), w, r)
+		log.Println("resave oauth/authorize")
+
+		sessionStore, err := session.Start(r.Context(), w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
 		var form url.Values
-		if v, ok := store.Get("ReturnUri"); ok {
+		if v, ok := sessionStore.Get("ReturnUri"); ok {
 			form = v.(url.Values)
 		}
 		r.Form = form
 
-		store.Delete("ReturnUri")
-		store.Save()
+		sessionStore.Delete("ReturnUri")
+		sessionStore.Save()
 
 		err = srv.HandleAuthorizeRequest(w, r)
 		if err != nil {
@@ -140,9 +130,8 @@ func main() {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-
 		data := map[string]interface{}{
-			"expires_in": int64(token.GetAccessCreateAt().Add(token.GetAccessExpiresIn()).Sub(time.Now()).Seconds()),
+			"expires_in": int64(time.Until(token.GetAccessCreateAt().Add(token.GetAccessExpiresIn())).Seconds()),
 			"client_id":  token.GetClientID(),
 			"user_id":    token.GetUserID(),
 		}
@@ -154,7 +143,7 @@ func main() {
 	log.Printf("Server is running at %d port.\n", portvar)
 	log.Printf("Point your OAuth client Auth endpoint to %s:%d%s", "http://localhost", portvar, "/oauth/authorize")
 	log.Printf("Point your OAuth client Token endpoint to %s:%d%s", "http://localhost", portvar, "/oauth/token")
-	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%d", portvar), nil))
+	go http.ListenAndServe(fmt.Sprintf(":%d", portvar), nil)
 }
 
 func dumpRequest(writer io.Writer, header string, r *http.Request) error {
@@ -227,7 +216,7 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 	if dumpvar {
 		_ = dumpRequest(os.Stdout, "auth", r) // Ignore the error
 	}
-	store, err := session.Start(nil, w, r)
+	store, err := session.Start(r.Context(), w, r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -243,12 +232,14 @@ func authHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func outputHTML(w http.ResponseWriter, req *http.Request, filename string) {
-	file, err := os.Open(filename)
+	file, err := static.Open(filename)
+	// file, err := os.Open(filename)
 	if err != nil {
 		http.Error(w, err.Error(), 500)
 		return
 	}
 	defer file.Close()
 	fi, _ := file.Stat()
-	http.ServeContent(w, req, file.Name(), fi.ModTime(), file)
+	http.ServeContent(w, req, fi.Name(), fi.ModTime(), file.(io.ReadSeeker))
+
 }

@@ -11,6 +11,7 @@ import (
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
 	"github.com/mozyy/empty-news/services/news"
+	"github.com/mozyy/empty-news/services/oauth"
 	"github.com/mozyy/empty-news/services/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -44,6 +45,8 @@ func main() {
 	// Register handler
 
 	register(grpcServer)
+
+	oauth.New()
 
 	log.Printf("starting")
 	if err := grpcServer.Serve(lis); err != nil {

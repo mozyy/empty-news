@@ -5,19 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/models"
-	"gorm.io/driver/mysql"
+	"github.com/mozyy/empty-news/utils/db"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
 )
 
-// StoreItem data item
-type StoreItem struct {
+// Oauth2Token data item
+type Oauth2Token struct {
 	gorm.Model
 
 	ExpiredAt int64
@@ -27,72 +25,25 @@ type StoreItem struct {
 	Data      string `gorm:"type:text"`
 }
 
-// NewConfig create mysql configuration instance
-func NewConfig(dsn string, tableName string) *Config {
-	return &Config{
-		DSN:         dsn,
-		TableName:   tableName,
-		MaxLifetime: time.Hour * 2,
-	}
+// NewStoreToken create mysql store instance,
+func NewStoreToken() *StoreToken {
+
+	dbGorm := db.NewGorm("e_user")
+
+	return NewStoreWithDB(dbGorm)
 }
 
-// Config gorm configuration
-type Config struct {
-	DSN         string
-	TableName   string
-	MaxLifetime time.Duration
-}
-
-var defaultConfig = &gorm.Config{
-	Logger: logger.New(
-		log.New(os.Stdout, "\r\n", log.LstdFlags), // io writer
-		logger.Config{
-			SlowThreshold: time.Second, // slow SQL
-			LogLevel:      logger.Info, // log level
-			Colorful:      true,        // color
-		},
-	),
-}
-
-// NewStore create mysql store instance,
-func NewStore(config *Config, gcInterval int) *Store {
-	d := mysql.New(mysql.Config{
-		DSN: config.DSN,
-	})
-
-	db, err := gorm.Open(d, defaultConfig)
-	if err != nil {
-		panic(err)
-	}
-	// default client pool
-	s, err := db.DB()
-	if err != nil {
-		panic(err)
-	}
-	s.SetMaxIdleConns(10)
-	s.SetMaxOpenConns(100)
-	s.SetConnMaxLifetime(time.Hour)
-
-	return NewStoreWithDB(config, db, gcInterval)
-}
-
-func NewStoreWithDB(config *Config, db *gorm.DB, gcInterval int) *Store {
-	store := &Store{
-		db:        db,
-		tableName: "oauth2_token",
-		stdout:    os.Stderr,
-	}
-	if config.TableName != "" {
-		store.tableName = config.TableName
+func NewStoreWithDB(db *gorm.DB) *StoreToken {
+	store := &StoreToken{
+		db:     db,
+		stdout: os.Stderr,
 	}
 	interval := 600
-	if gcInterval > 0 {
-		interval = gcInterval
-	}
+
 	store.ticker = time.NewTicker(time.Second * time.Duration(interval))
 
-	if !db.Migrator().HasTable(store.tableName) {
-		if err := db.Table(store.tableName).Migrator().CreateTable(&StoreItem{}); err != nil {
+	if !db.Migrator().HasTable(Oauth2Token{}) {
+		if err := db.Migrator().CreateTable(&Oauth2Token{}); err != nil {
 			panic(err)
 		}
 	}
@@ -101,43 +52,42 @@ func NewStoreWithDB(config *Config, db *gorm.DB, gcInterval int) *Store {
 	return store
 }
 
-// Store mysql token store
-type Store struct {
-	tableName string
-	db        *gorm.DB
-	stdout    io.Writer
-	ticker    *time.Ticker
+// StoreToken mysql token store
+type StoreToken struct {
+	db     *gorm.DB
+	stdout io.Writer
+	ticker *time.Ticker
 }
 
 // SetStdout set error output
-func (s *Store) SetStdout(stdout io.Writer) *Store {
+func (s *StoreToken) SetStdout(stdout io.Writer) *StoreToken {
 	s.stdout = stdout
 	return s
 }
 
 // Close close the store
-func (s *Store) Close() {
+func (s *StoreToken) Close() {
 	s.ticker.Stop()
 }
 
-func (s *Store) errorf(format string, args ...interface{}) {
+func (s *StoreToken) errorf(format string, args ...interface{}) {
 	if s.stdout != nil {
 		buf := fmt.Sprintf(format, args...)
 		s.stdout.Write([]byte(buf))
 	}
 }
 
-func (s *Store) gc() {
+func (s *StoreToken) gc() {
 	for range s.ticker.C {
 		now := time.Now().Unix()
 		var count int64
-		if err := s.db.Table(s.tableName).Where("expired_at <= ?", now).Or("code = ? and access = ? AND refresh = ?", "", "", "").Count(&count).Error; err != nil {
+		if err := s.db.Model(&Oauth2Token{}).Where("expired_at <= ?", now).Or("code = ? and access = ? AND refresh = ?", "", "", "").Count(&count).Error; err != nil {
 			s.errorf("[ERROR]:%s\n", err)
 			return
 		}
 		if count > 0 {
 			// not soft delete.
-			if err := s.db.Table(s.tableName).Where("expired_at <= ?", now).Or("code = ? and access = ? AND refresh = ?", "", "", "").Unscoped().Delete(&StoreItem{}).Error; err != nil {
+			if err := s.db.Model(&Oauth2Token{}).Where("expired_at <= ?", now).Or("code = ? and access = ? AND refresh = ?", "", "", "").Unscoped().Delete(&Oauth2Token{}).Error; err != nil {
 				s.errorf("[ERROR]:%s\n", err)
 			}
 		}
@@ -145,12 +95,12 @@ func (s *Store) gc() {
 }
 
 // Create create and store the new token information
-func (s *Store) Create(ctx context.Context, info oauth2.TokenInfo) error {
+func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	jv, err := json.Marshal(info)
 	if err != nil {
 		return err
 	}
-	item := &StoreItem{
+	item := &Oauth2Token{
 		Data: string(jv),
 	}
 
@@ -167,37 +117,37 @@ func (s *Store) Create(ctx context.Context, info oauth2.TokenInfo) error {
 		}
 	}
 
-	return s.db.WithContext(ctx).Table(s.tableName).Create(item).Error
+	return s.db.WithContext(ctx).Create(item).Error
 }
 
 // RemoveByCode delete the authorization code
-func (s *Store) RemoveByCode(ctx context.Context, code string) error {
+func (s *StoreToken) RemoveByCode(ctx context.Context, code string) error {
 	return s.db.WithContext(ctx).
-		Table(s.tableName).
+		Model(&Oauth2Token{}).
 		Where("code = ?", code).
 		Update("code", "").
 		Error
 }
 
 // RemoveByAccess use the access token to delete the token information
-func (s *Store) RemoveByAccess(ctx context.Context, access string) error {
+func (s *StoreToken) RemoveByAccess(ctx context.Context, access string) error {
 	return s.db.WithContext(ctx).
-		Table(s.tableName).
+		Model(&Oauth2Token{}).
 		Where("access = ?", access).
 		Update("access", "").
 		Error
 }
 
 // RemoveByRefresh use the refresh token to delete the token information
-func (s *Store) RemoveByRefresh(ctx context.Context, refresh string) error {
+func (s *StoreToken) RemoveByRefresh(ctx context.Context, refresh string) error {
 	return s.db.WithContext(ctx).
-		Table(s.tableName).
+		Model(&Oauth2Token{}).
 		Where("refresh = ?", refresh).
 		Update("refresh", "").
 		Error
 }
 
-func (s *Store) toTokenInfo(data string) oauth2.TokenInfo {
+func (s *StoreToken) toTokenInfo(data string) oauth2.TokenInfo {
 	var tm models.Token
 	err := json.Unmarshal([]byte(data), &tm)
 	if err != nil {
@@ -207,14 +157,13 @@ func (s *Store) toTokenInfo(data string) oauth2.TokenInfo {
 }
 
 // GetByCode use the authorization code for token information data
-func (s *Store) GetByCode(ctx context.Context, code string) (oauth2.TokenInfo, error) {
+func (s *StoreToken) GetByCode(ctx context.Context, code string) (oauth2.TokenInfo, error) {
 	if code == "" {
 		return nil, nil
 	}
 
-	var item StoreItem
+	var item Oauth2Token
 	if err := s.db.WithContext(ctx).
-		Table(s.tableName).
 		Where("code = ?", code).
 		Find(&item).Error; err != nil {
 		return nil, err
@@ -227,14 +176,13 @@ func (s *Store) GetByCode(ctx context.Context, code string) (oauth2.TokenInfo, e
 }
 
 // GetByAccess use the access token for token information data
-func (s *Store) GetByAccess(ctx context.Context, access string) (oauth2.TokenInfo, error) {
+func (s *StoreToken) GetByAccess(ctx context.Context, access string) (oauth2.TokenInfo, error) {
 	if access == "" {
 		return nil, nil
 	}
 
-	var item StoreItem
+	var item Oauth2Token
 	if err := s.db.WithContext(ctx).
-		Table(s.tableName).
 		Where("access = ?", access).
 		Find(&item).Error; err != nil {
 		return nil, err
@@ -247,14 +195,13 @@ func (s *Store) GetByAccess(ctx context.Context, access string) (oauth2.TokenInf
 }
 
 // GetByRefresh use the refresh token for token information data
-func (s *Store) GetByRefresh(ctx context.Context, refresh string) (oauth2.TokenInfo, error) {
+func (s *StoreToken) GetByRefresh(ctx context.Context, refresh string) (oauth2.TokenInfo, error) {
 	if refresh == "" {
 		return nil, nil
 	}
 
-	var item StoreItem
+	var item Oauth2Token
 	if err := s.db.WithContext(ctx).
-		Table(s.tableName).
 		Where("refresh = ?", refresh).
 		Find(&item).Error; err != nil {
 		return nil, err
