@@ -10,6 +10,7 @@ import (
 	"net/http/httputil"
 	"net/url"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
@@ -58,12 +59,14 @@ func New() {
 
 	srv := server.NewServer(server.NewConfig(), manager)
 
-	srv.SetPasswordAuthorizationHandler(func(username, password string) (userID string, err error) {
-		if username == "test" && password == "test" {
-			userID = "test"
+	userStore := store.NewUser()
+
+	srv.SetPasswordAuthorizationHandler(func(mobile, password string) (ID string, err error) {
+		user, err := userStore.Get(mobile, password)
+		if err != nil {
+			return
 		}
-		log.Fatalln("SetPasswordAuthorizationHandler")
-		return
+		return strconv.FormatUint(uint64(user.ID), 10), nil
 	})
 
 	srv.SetUserAuthorizationHandler(userAuthorizeHandler)
