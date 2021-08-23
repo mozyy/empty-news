@@ -10,9 +10,9 @@ import (
 
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
+	"github.com/mozyy/empty-news/services/auth"
 	"github.com/mozyy/empty-news/services/news"
 	"github.com/mozyy/empty-news/services/oauth"
-	"github.com/mozyy/empty-news/services/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -89,6 +89,6 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 func register(grpcServer *grpc.Server) {
 	// Register handler
 	pbnews.RegisterNewsServer(grpcServer, news.New())
-	pbuser.RegisterUserServer(grpcServer, user.New())
-	// pbuser.RegisterUserServer(grpcServer, user.Struct)
+	// pbuser.RegisterUserServer(grpcServer, user.New())
+	pbuser.RegisterUserServer(grpcServer, auth.New())
 }

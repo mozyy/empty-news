@@ -1,7 +1,8 @@
-package store
+package oauth
 
 import (
 	"context"
+	"log"
 	"strconv"
 
 	"github.com/go-oauth2/oauth2/v4"
@@ -39,6 +40,7 @@ func NewClient() *Client {
 func (c *Client) GetByID(ctx context.Context, id string) (oauth2.ClientInfo, error) {
 	client := &Oauth2Client{}
 	res := c.First(client, id)
+	log.Println(res)
 	return client, res.Error
 }
 func (c *Oauth2Client) GetID() string {
