@@ -38,17 +38,27 @@ func (u *User) Add(mobile, password string) (ID uint, err error) {
 		err = errors.New("参数不完整")
 		return
 	}
+	users := &[]Oauth2User{}
+	ress := u.Find(users, "mobile=?", mobile)
+	if ress.Error != nil {
+		err = ress.Error
+		return
+	}
+	if ress.RowsAffected != 0 {
+		err = errors.New("已注册")
+		return
+	}
 	passwordHash, err := utils.HashPassword(password)
 	if err != nil {
 		return
 	}
 	user := &Oauth2User{Mobile: mobile, PasswordHash: passwordHash}
 	res := u.Create(user)
-	err = res.Error
-	if err != nil {
+	if res.Error != nil {
+		err = res.Error
 		return
 	}
-	return user.ID, res.Error
+	return user.ID, nil
 }
 
 func (u *User) Get(mobile, password string) (user *Oauth2User, err error) {

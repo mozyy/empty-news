@@ -8,6 +8,8 @@ import (
 	"net"
 	"strings"
 
+	"github.com/dgrijalva/jwt-go"
+	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
 	"github.com/mozyy/empty-news/services/auth"
@@ -61,11 +63,25 @@ func valid(authorization []string) bool {
 	if len(authorization) < 1 {
 		return false
 	}
-	token := strings.TrimPrefix(authorization[0], "Bearer ")
+	access := strings.TrimPrefix(authorization[0], "Bearer ")
+	if access == "some-secret-token" {
+		return true
+	}
 	// Perform the token validation here. For the sake of this example, the code
 	// here forgoes any of the usual OAuth2 token validation and instead checks
 	// for a token matching an arbitrary string.
-	return token == "some-secret-token"
+	// Parse and verify jwt access token
+	token, err := jwt.ParseWithClaims(access, &generates.JWTAccessClaims{}, func(t *jwt.Token) (interface{}, error) {
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, fmt.Errorf("parse error")
+		}
+		return []byte("00000000"), nil
+	})
+	if err != nil {
+		return false
+	}
+	_, ok := token.Claims.(*generates.JWTAccessClaims)
+	return (ok && token.Valid)
 }
 
 // ensureValidToken ensures a valid token exists within a request's metadata. If
