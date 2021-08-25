@@ -12,9 +12,10 @@ import (
 	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
-	"github.com/mozyy/empty-news/services/auth"
+	"github.com/mozyy/empty-news/services/conf"
 	"github.com/mozyy/empty-news/services/news"
 	"github.com/mozyy/empty-news/services/oauth"
+	"github.com/mozyy/empty-news/services/user"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
@@ -49,6 +50,7 @@ func main() {
 	register(grpcServer)
 
 	oauth.New()
+	conf.New()
 
 	log.Printf("starting")
 	if err := grpcServer.Serve(lis); err != nil {
@@ -106,5 +108,5 @@ func register(grpcServer *grpc.Server) {
 	// Register handler
 	pbnews.RegisterNewsServer(grpcServer, news.New())
 	// pbuser.RegisterUserServer(grpcServer, user.New())
-	pbuser.RegisterUserServer(grpcServer, auth.New())
+	pbuser.RegisterUserServer(grpcServer, user.New())
 }

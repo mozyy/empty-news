@@ -2,67 +2,57 @@ package user
 
 import (
 	"context"
-	"database/sql"
-	errorss "errors"
+	"errors"
 
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/proto/pbuser"
-	"github.com/mozyy/empty-news/utils/db"
-	"github.com/mozyy/empty-news/utils/errors"
+	"github.com/mozyy/empty-news/services/oauth"
+	"golang.org/x/oauth2"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-const table = "e_user"
-
-type user struct {
-	db *sql.DB
+type User struct {
+	user *oauth.User
 }
 
-func New() pbuser.UserServer {
-	return &user{db.New(table)}
+func New() *User {
+	return &User{user: oauth.NewUser()}
 }
 
-type State int
-
-const (
-	Normal State = iota
-	Deactivated
-	Deleted
-)
-
-var stateMap = []string{"正常", "停用", "删除"}
-
-func (s State) String() string {
-	if len(stateMap) < int(s) {
-		return ""
-	}
-	return stateMap[s]
-}
-
-var e = errors.New("user")
-
-func (u *user) Register(_ context.Context, req *pbuser.RegisterRequest) (*pbuser.LoginResponse, error) {
-	if req.GetMobile() == "" || req.GetPassword() == "" {
-		return &pbuser.LoginResponse{}, e.Desc("参数不完整")
-	}
-	var id int64
-	err := u.db.QueryRow("SELECT id FROM user where mobile = ?;", req.Mobile).Scan(&id)
-	if err != nil && !errorss.Is(err, sql.ErrNoRows) {
-		return &pbuser.LoginResponse{}, e.Err("查询错误", err)
-	}
-	if id != 0 {
-		return &pbuser.LoginResponse{}, e.Err("已经注册过", err)
-	}
-	_, err = u.db.Exec("INSERT INTO user (mobile, password) VALUES (?, ?);", req.Mobile, req.Password)
+func (a *User) Register(ctx context.Context, req *pbuser.RegisterRequest) (*pbmodel.OAuthToken, error) {
+	_, err := a.user.Add(req.GetMobile(), req.GetPassword())
 	if err != nil {
-		return &pbuser.LoginResponse{}, e.Err("写入错误", err)
+		return &pbmodel.OAuthToken{}, err
 	}
-	return &pbuser.LoginResponse{}, nil
+	return &pbmodel.OAuthToken{}, err
 }
 
-func (u *user) Login(_ context.Context, req *pbuser.LoginRequest) (*pbuser.LoginResponse, error) {
-	panic("not implemented") // TODO: Implement
+func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbmodel.OAuthToken, error) {
+	if req.GetMobile() == "" || req.GetPassword() == "" {
+		return &pbmodel.OAuthToken{}, errors.New("参数不完整")
+	}
+	// httpClient := &http.Client{Timeout: 2 * time.Second}
+	// ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
+	authServerURL := "http://0.0.0.0:9096"
+	config := oauth2.Config{
+		ClientID:     "2",
+		ClientSecret: "22222222",
+		Scopes:       []string{"all", "read"},
+		RedirectURL:  "http://0.0.0.0:9096/oauth2",
+		Endpoint: oauth2.Endpoint{
+			AuthURL:  authServerURL + "/oauth/authorize",
+			TokenURL: authServerURL + "/oauth/token",
+		},
+	}
+	token, err := config.PasswordCredentialsToken(ctx, req.GetMobile(), req.GetPassword())
+	if err != nil {
+		return nil, err
+	}
+	return &pbmodel.OAuthToken{AccessToken: token.AccessToken,
+		TokenType: token.TokenType, RefreshToken: token.RefreshToken}, nil
 }
 
-func (u *user) Info(_ context.Context, req *emptypb.Empty) (*pbuser.InfoResponse, error) {
+func (a *User) Info(_ context.Context, _ *emptypb.Empty) (*pbuser.InfoResponse, error) {
 	panic("not implemented") // TODO: Implement
 }
