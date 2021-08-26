@@ -32,6 +32,5 @@ func New() *conf {
 
 func (c *Conf) ToPB() *pbmodel.Conf {
 	return &pbmodel.Conf{
-		Id:        uint32(c.Model.ID),
 		CreatedAt: timestamppb.New(c.CreatedAt)}
 }

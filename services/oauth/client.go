@@ -27,7 +27,7 @@ func NewClient() *Client {
 		dbGorm,
 	}
 
-	// dbGorm.Create(&Oauth2Client{Secret: "22222222", Domain: "http://localhost:9094", UserID: "222222"})
+	// dbGorm.Create(&Oauth2Client{Secret: uuid.NewString()})
 	if !dbGorm.Migrator().HasTable(Oauth2Client{}) {
 		if err := dbGorm.Migrator().CreateTable(&Oauth2Client{}); err != nil {
 			panic(err)

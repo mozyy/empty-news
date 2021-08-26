@@ -8,24 +8,17 @@ import (
 	"net"
 	"strings"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
 	"github.com/mozyy/empty-news/services/conf"
 	"github.com/mozyy/empty-news/services/news"
 	"github.com/mozyy/empty-news/services/oauth"
 	"github.com/mozyy/empty-news/services/user"
+	"github.com/mozyy/empty-news/utils/errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/status"
 )
 
-var (
-	errMissingMetadata = status.Errorf(codes.InvalidArgument, "missing metadata")
-	errInvalidToken    = status.Errorf(codes.Unauthenticated, "invalid token")
-)
 var port = flag.Int("port", 50051, "the port to serve on")
 
 func main() {
@@ -60,48 +53,59 @@ func main() {
 	}
 }
 
-// valid validates the authorization.
-func valid(authorization []string) bool {
-	if len(authorization) < 1 {
-		return false
-	}
-	access := strings.TrimPrefix(authorization[0], "Bearer ")
-	if access == "some-secret-token" {
-		return true
-	}
-	// Perform the token validation here. For the sake of this example, the code
-	// here forgoes any of the usual OAuth2 token validation and instead checks
-	// for a token matching an arbitrary string.
-	// Parse and verify jwt access token
-	token, err := jwt.ParseWithClaims(access, &generates.JWTAccessClaims{}, func(t *jwt.Token) (interface{}, error) {
-		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("parse error")
-		}
-		return []byte("00000000"), nil
-	})
-	if err != nil {
-		return false
-	}
-	_, ok := token.Claims.(*generates.JWTAccessClaims)
-	return (ok && token.Valid)
-}
-
 // ensureValidToken ensures a valid token exists within a request's metadata. If
 // the token is missing or invalid, the interceptor blocks execution of the
 // handler and returns an error. Otherwise, the interceptor invokes the unary
 // handler.
 func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
-	md, ok := metadata.FromIncomingContext(ctx)
-	if !ok {
-		return nil, errMissingMetadata
-	}
 	// The keys within metadata.MD are normalized to lowercase.
 	// See: https://godoc.org/google.golang.org/grpc/metadata#New
-	if !valid(md["authorization"]) {
-		return nil, errInvalidToken
+	// if !valid(md["authorization"]) {
+	// 	return nil, errInvalidToken
+	// }
+	apiScopes := []string{}
+	for _, api := range *conf.Apis {
+		if api.Api == info.FullMethod {
+			// 接口配置了public: 公共接口
+			if api.Scope == "public" {
+				return handler(ctx, req)
+			}
+			apiScopes = append(apiScopes, api.Scope)
+		}
 	}
-	// Continue execution of handler after ensuring a valid token.
-	return handler(ctx, req)
+	md, ok := metadata.FromIncomingContext(ctx)
+	if !ok {
+		return nil, errors.ErrInvalidToken
+	}
+	authorization := md["authorization"]
+
+	if len(authorization) < 1 {
+		return nil, errors.ErrInvalidToken
+	}
+	access := strings.TrimPrefix(authorization[0], "Bearer ")
+
+	token, err := oauth.TokenStore.GetByAccess(ctx, access)
+	if err != nil {
+		return nil, errors.ErrInvalidToken
+	}
+	// 重启后用老的token会异常
+	if token == nil {
+		return nil, errors.ErrInvalidToken
+	}
+	scopeStr := token.GetScope()
+	userScopes := strings.Split(scopeStr, " ")
+	for _, us := range userScopes {
+		// 用户admin: 超级管理员
+		if us == "admin" {
+			return handler(ctx, req)
+		}
+		for _, as := range apiScopes {
+			if us == as {
+				return handler(ctx, req)
+			}
+		}
+	}
+	return nil, errors.ErrPermissionDenied
 }
 
 func register(grpcServer *grpc.Server) {
