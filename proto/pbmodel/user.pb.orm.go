@@ -27,7 +27,7 @@ type UserORM struct {
 	DeletedAt    gorm_io_gorm.DeletedAt `gorm:"index"`
 }
 
-func (*UserORM) Name() string {
+func (*UserORM) TableName() string {
 	return "users"
 }
 

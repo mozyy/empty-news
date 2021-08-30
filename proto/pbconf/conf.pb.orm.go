@@ -21,18 +21,19 @@ var _ = fmt.Errorf
 var _ = math.Inf
 
 type ConfigORM struct {
-	ID            uint32 `gorm:"primary_key"`
-	Type          string
-	Value         string
-	Content       string
-	Desc          string
-	OAuthTokenORM pbmodel.OAuthTokenORM `gorm:"foreignKey:OAuthTokenORM"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-	DeletedAt     gorm_io_gorm.DeletedAt `gorm:"index"`
+	ID              uint32 `gorm:"primary_key"`
+	Type            string
+	Value           string
+	Content         string
+	Desc            string
+	OAuthTokenORM   *pbmodel.OAuthTokenORM `gorm:"foreignKey:OAuthTokenORMID"`
+	OAuthTokenORMID uint32
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+	DeletedAt       gorm_io_gorm.DeletedAt `gorm:"index"`
 }
 
-func (*ConfigORM) Name() string {
+func (*ConfigORM) TableName() string {
 	return "configs"
 }
 
@@ -56,14 +57,15 @@ func (o *ConfigORM) ToPB() *Config {
 
 func (s *Config) ToORM() *ConfigORM {
 	value := &ConfigORM{
-		ID:            s.ID,
-		Type:          s.Type,
-		Value:         s.Value,
-		Content:       s.Content,
-		Desc:          s.Desc,
-		OAuthTokenORM: s.OAuthToken.ToORM(),
-		CreatedAt:     s.CreatedAt.AsTime(),
-		UpdatedAt:     s.UpdatedAt.AsTime(),
+		ID:              s.ID,
+		Type:            s.Type,
+		Value:           s.Value,
+		Content:         s.Content,
+		Desc:            s.Desc,
+		OAuthTokenORM:   s.OAuthToken.ToORM(),
+		OAuthTokenORMID: s.OAuthToken.ID,
+		CreatedAt:       s.CreatedAt.AsTime(),
+		UpdatedAt:       s.UpdatedAt.AsTime(),
 	}
 	value.DeletedAt.Scan(s.DeletedAt)
 	return value
@@ -73,7 +75,7 @@ type DeleteTypeORM struct {
 	Id uint32
 }
 
-func (*DeleteTypeORM) Name() string {
+func (*DeleteTypeORM) TableName() string {
 	return "delete_types"
 }
 

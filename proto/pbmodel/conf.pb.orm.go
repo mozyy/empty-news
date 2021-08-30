@@ -29,7 +29,7 @@ type ConfORM struct {
 	DeletedAt gorm_io_gorm.DeletedAt `gorm:"index"`
 }
 
-func (*ConfORM) Name() string {
+func (*ConfORM) TableName() string {
 	return "confs"
 }
 

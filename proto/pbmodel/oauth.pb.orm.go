@@ -29,7 +29,7 @@ type OAuthTokenORM struct {
 	DeletedAt      gorm_io_gorm.DeletedAt `gorm:"index"`
 }
 
-func (*OAuthTokenORM) Name() string {
+func (*OAuthTokenORM) TableName() string {
 	return "o_auth_tokens"
 }
 
@@ -50,7 +50,7 @@ func (o *OAuthTokenORM) ToPB() *OAuthToken {
 	return value
 }
 
-func (s OAuthToken) ToORM() OAuthTokenORM {
+func (s *OAuthToken) ToORM() *OAuthTokenORM {
 	value := &OAuthTokenORM{
 		ID:             s.ID,
 		AccessToken:    s.AccessToken,
@@ -61,7 +61,7 @@ func (s OAuthToken) ToORM() OAuthTokenORM {
 		UpdatedAt:      s.UpdatedAt.AsTime(),
 	}
 	value.DeletedAt.Scan(s.DeletedAt)
-	return *value
+	return value
 }
 
 type OAuthClientORM struct {
@@ -74,7 +74,7 @@ type OAuthClientORM struct {
 	DeletedAt gorm_io_gorm.DeletedAt `gorm:"index"`
 }
 
-func (*OAuthClientORM) Name() string {
+func (*OAuthClientORM) TableName() string {
 	return "o_auth_clients"
 }
 
