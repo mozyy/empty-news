@@ -1,26 +1,23 @@
-package oauth
+package user
 
 import (
 	"errors"
 
+	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/utils"
 	"github.com/mozyy/empty-news/utils/db"
 	"gorm.io/gorm"
 )
 
-type User struct {
+type UserStore struct {
 	*gorm.DB
 }
-type Oauth2User struct {
-	gorm.Model
-	Mobile       string
-	PasswordHash string
-}
+type Oauth2User = pbmodel.UserORM
 
-func NewUser() *User {
+func NewUserStore() *UserStore {
 	dbGorm := db.NewGorm("e_user")
 
-	store := &User{
+	store := &UserStore{
 		dbGorm,
 	}
 
@@ -33,7 +30,7 @@ func NewUser() *User {
 	return store
 }
 
-func (u *User) Add(mobile, password string) (ID uint, err error) {
+func (u *UserStore) Add(mobile, password string) (ID uint32, err error) {
 	if mobile == "" || password == "" {
 		err = errors.New("参数不完整")
 		return
@@ -61,14 +58,14 @@ func (u *User) Add(mobile, password string) (ID uint, err error) {
 	return user.ID, nil
 }
 
-func (u *User) Get(mobile, password string) (user *Oauth2User, err error) {
+func (u *UserStore) Get(mobile, password string) (user *Oauth2User, err error) {
 	if mobile == "" || password == "" {
 		err = errors.New("参数不完整")
 		return
 	}
 
-	users := &Oauth2User{}
-	res := u.First(users, "mobile=?", mobile)
+	users := &Oauth2User{Mobile: mobile}
+	res := u.First(users)
 	err = res.Error
 	if err != nil {
 		return

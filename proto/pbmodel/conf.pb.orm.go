@@ -63,3 +63,46 @@ func (s *Conf) ToORM() *ConfORM {
 	value.DeletedAt.Scan(s.DeletedAt)
 	return value
 }
+
+type ConfApiORM struct {
+	ID        uint32 `gorm:"primary_key"`
+	Api       string
+	Scope     string
+	Desc      string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	DeletedAt gorm_io_gorm.DeletedAt `gorm:"index"`
+}
+
+func (*ConfApiORM) TableName() string {
+	return "conf_apis"
+}
+
+func (o *ConfApiORM) ToPB() *ConfApi {
+	value := &ConfApi{
+		ID:        o.ID,
+		Api:       o.Api,
+		Scope:     o.Scope,
+		Desc:      o.Desc,
+		CreatedAt: timestamppb.New(o.CreatedAt),
+		UpdatedAt: timestamppb.New(o.UpdatedAt),
+	}
+	deletedAtValue, _ := o.DeletedAt.Value()
+	if deletedAt, ok := deletedAtValue.(time.Time); ok {
+		value.DeletedAt = timestamppb.New(deletedAt)
+	}
+	return value
+}
+
+func (s *ConfApi) ToORM() *ConfApiORM {
+	value := &ConfApiORM{
+		ID:        s.ID,
+		Api:       s.Api,
+		Scope:     s.Scope,
+		Desc:      s.Desc,
+		CreatedAt: s.CreatedAt.AsTime(),
+		UpdatedAt: s.UpdatedAt.AsTime(),
+	}
+	value.DeletedAt.Scan(s.DeletedAt)
+	return value
+}

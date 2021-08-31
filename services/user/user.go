@@ -7,18 +7,17 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/proto/pbuser"
-	"github.com/mozyy/empty-news/services/oauth"
 	"github.com/mozyy/empty-news/utils/errors"
 	"golang.org/x/oauth2"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type User struct {
-	user *oauth.User
+	user *UserStore
 }
 
 func New() *User {
-	return &User{user: oauth.NewUser()}
+	return &User{user: NewUserStore()}
 }
 
 func (a *User) Register(ctx context.Context, req *pbuser.RegisterRequest) (*pbmodel.OAuthToken, error) {
@@ -37,8 +36,8 @@ func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbmodel.OA
 	// ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
 	authServerURL := "http://0.0.0.0:9096"
 	config := oauth2.Config{
-		ClientID:     "3",
-		ClientSecret: "2ce273e6-2251-4f8d-b416-7a53e54f8097",
+		ClientID:     "1",
+		ClientSecret: "286786c5-9b22-4afe-ad64-0716132b915b",
 		Scopes:       []string{"admin"},
 		RedirectURL:  "http://0.0.0.0:9096/oauth2",
 		Endpoint: oauth2.Endpoint{

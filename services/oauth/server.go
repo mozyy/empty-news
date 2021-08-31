@@ -14,6 +14,7 @@ import (
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/go-oauth2/oauth2/v4/store"
+	"github.com/mozyy/empty-news/services/user"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
 	"github.com/go-oauth2/oauth2/v4/manage"
@@ -56,7 +57,7 @@ func New() {
 
 	srv := server.NewServer(server.NewConfig(), manager)
 
-	userStore := NewUser()
+	userStore := user.NewUserStore()
 
 	srv.SetPasswordAuthorizationHandler(func(mobile, password string) (ID string, err error) {
 		user, err := userStore.Get(mobile, password)

@@ -6,6 +6,8 @@ import (
 	"strconv"
 
 	"github.com/go-oauth2/oauth2/v4"
+	"github.com/google/uuid"
+	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/utils/db"
 	"gorm.io/gorm"
 )
@@ -14,10 +16,7 @@ type Client struct {
 	*gorm.DB
 }
 type Oauth2Client struct {
-	gorm.Model
-	Secret string
-	Domain string
-	UserID string
+	pbmodel.OAuthClientORM
 }
 
 func NewClient() *Client {
@@ -27,12 +26,12 @@ func NewClient() *Client {
 		dbGorm,
 	}
 
-	// dbGorm.Create(&Oauth2Client{Secret: uuid.NewString()})
-	if !dbGorm.Migrator().HasTable(Oauth2Client{}) {
+	if !dbGorm.Migrator().HasTable(&Oauth2Client{}) {
 		if err := dbGorm.Migrator().CreateTable(&Oauth2Client{}); err != nil {
 			panic(err)
 		}
 	}
+	dbGorm.Create(&Oauth2Client{OAuthClientORM: pbmodel.OAuthClientORM{Secret: uuid.NewString()}})
 	return store
 }
 

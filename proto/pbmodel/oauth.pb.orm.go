@@ -68,7 +68,7 @@ type OAuthClientORM struct {
 	ID        uint32 `gorm:"primary_key"`
 	Secret    string
 	Domain    string
-	User_ID   string
+	UserID    string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm_io_gorm.DeletedAt `gorm:"index"`
@@ -83,7 +83,7 @@ func (o *OAuthClientORM) ToPB() *OAuthClient {
 		ID:        o.ID,
 		Secret:    o.Secret,
 		Domain:    o.Domain,
-		User_ID:   o.User_ID,
+		UserID:    o.UserID,
 		CreatedAt: timestamppb.New(o.CreatedAt),
 		UpdatedAt: timestamppb.New(o.UpdatedAt),
 	}
@@ -99,7 +99,7 @@ func (s *OAuthClient) ToORM() *OAuthClientORM {
 		ID:        s.ID,
 		Secret:    s.Secret,
 		Domain:    s.Domain,
-		User_ID:   s.User_ID,
+		UserID:    s.UserID,
 		CreatedAt: s.CreatedAt.AsTime(),
 		UpdatedAt: s.UpdatedAt.AsTime(),
 	}
