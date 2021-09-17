@@ -106,7 +106,12 @@ func New() {
 	})
 
 	log.Printf("Server is running at %d port.\n", portvar)
-	go http.ListenAndServe(fmt.Sprintf(":%d", portvar), nil)
+	go func() {
+		err = http.ListenAndServe(fmt.Sprintf(":%d", portvar), nil)
+		if err != nil {
+			log.Println("oauth server err:", err)
+		}
+	}()
 }
 
 func dumpRequest(writer io.Writer, header string, r *http.Request) error {

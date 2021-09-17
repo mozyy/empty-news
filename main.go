@@ -63,6 +63,7 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	// if !valid(md["authorization"]) {
 	// 	return nil, errInvalidToken
 	// }
+	log.Println("recive method: ", info.FullMethod)
 	apiScopes := []string{}
 	for _, api := range *conf.Apis {
 		if api.Api == info.FullMethod {

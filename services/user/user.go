@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"log"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -34,7 +35,7 @@ func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbmodel.OA
 	}
 	// httpClient := &http.Client{Timeout: 2 * time.Second}
 	// ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
-	authServerURL := "http://0.0.0.0:9096"
+	authServerURL := "http://localhost:9096"
 	config := oauth2.Config{
 		ClientID:     "1",
 		ClientSecret: "286786c5-9b22-4afe-ad64-0716132b915b",
@@ -45,10 +46,12 @@ func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbmodel.OA
 			TokenURL: authServerURL + "/oauth/token",
 		},
 	}
+	log.Println("recive Login: ", time.Now())
 	token, err := config.PasswordCredentialsToken(ctx, req.GetMobile(), req.GetPassword())
 	if err != nil {
 		return nil, err
 	}
+	log.Println("recive Login: ", time.Now())
 
 	return &pbmodel.OAuthToken{AccessToken: token.AccessToken,
 		TokenType: token.TokenType, RefreshToken: token.RefreshToken,

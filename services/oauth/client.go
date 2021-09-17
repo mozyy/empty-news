@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 	"strconv"
+	"time"
 
 	"github.com/go-oauth2/oauth2/v4"
-	"github.com/google/uuid"
 	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/utils/db"
 	"gorm.io/gorm"
@@ -31,15 +31,16 @@ func NewClient() *Client {
 			panic(err)
 		}
 	}
-	dbGorm.Create(&Oauth2Client{OAuthClientORM: pbmodel.OAuthClientORM{Secret: uuid.NewString()}})
+	// dbGorm.Create(&Oauth2Client{OAuthClientORM: pbmodel.OAuthClientORM{Secret: uuid.NewString()}})
 	return store
 }
 
 // according to the ID for the client information
 func (c *Client) GetByID(ctx context.Context, id string) (oauth2.ClientInfo, error) {
+	log.Println("*Client) GetByID", time.Now())
 	client := &Oauth2Client{}
 	res := c.First(client, id)
-	log.Println(res)
+	log.Println("*Client) GetByID", time.Now())
 	return client, res.Error
 }
 func (c *Oauth2Client) GetID() string {

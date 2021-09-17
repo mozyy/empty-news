@@ -2,6 +2,8 @@ package user
 
 import (
 	"errors"
+	"log"
+	"time"
 
 	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/utils"
@@ -64,18 +66,20 @@ func (u *UserStore) Get(mobile, password string) (user *Oauth2User, err error) {
 		return
 	}
 
-	users := &Oauth2User{Mobile: mobile}
-	res := u.First(users)
+	user = &Oauth2User{Mobile: mobile}
+	res := u.Where(user).First(user)
+	b := time.Now()
 	err = res.Error
 	if err != nil {
 		return
 	}
-	match := utils.CheckPasswordHash(password, users.PasswordHash)
+	match := utils.CheckPasswordHash(password, user.PasswordHash)
+	c := time.Now()
+	log.Println("get time: ", c.Sub(b), user.Mobile, user.PasswordHash)
 	if !match {
 		err = errors.New("密码不正确")
 		return
 	}
-	users.PasswordHash = ""
-	user = users
+	user.PasswordHash = ""
 	return
 }
