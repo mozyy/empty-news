@@ -3,6 +3,8 @@ package news
 import (
 	"context"
 	"log"
+	"sync"
+	"time"
 
 	"google.golang.org/protobuf/types/known/emptypb"
 
@@ -16,12 +18,43 @@ func New() pbnews.NewsServer {
 	return new(news)
 }
 
+type SafeList struct {
+	sync.Mutex
+	value *pbnews.ListResponse
+}
+
+func (c *SafeList) Set(list *pbnews.ListResponse) {
+	c.Lock()
+	c.value = list
+	c.Unlock()
+}
+
+func (c *SafeList) Get() *pbnews.ListResponse {
+	c.Lock()
+	defer c.Unlock()
+	return c.value
+}
+
+var listResponse = new(SafeList)
+
 // List is a single request handler called via client.Call or the generated client code
 func (e *news) List(ctx context.Context, req *emptypb.Empty) (*pbnews.ListResponse, error) {
 	log.Println("Received Empty.NewsList request")
+	// 接口有点慢, 缓存五分钟的结果
+	if listResponse.Get() != nil {
+		return listResponse.Get(), nil
+	}
 	res := &pbnews.ListResponse{}
 	list, err := crawler.News()
 	res.List = list
+	if err == nil {
+		listResponse.Set(res)
+		timer := time.NewTimer(5 * time.Minute)
+		go func() {
+			<-timer.C
+			listResponse.Set(nil)
+		}()
+	}
 	return res, err
 }
 
