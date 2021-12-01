@@ -30,29 +30,34 @@ import (
 )
 
 const (
-	address = "localhost:50051"
+	// address = "localhost:50051"
+	address = "https://yyue.vip/i/api/"
 )
 
 func main() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	log.Printf("start111  \n")
+	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
+	log.Printf("start \n")
 	defer conn.Close()
 	c := pbnews.NewNewsClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
+	start := time.Now()
 	r, err := c.List(ctx, new(emptypb.Empty))
 	if err != nil {
 		log.Fatalf("could not greet1: %v", err)
 	}
-	log.Printf("list: %s", r.GetList())
+	log.Printf("list: time: %s,length: %d", time.Since(start), len(r.GetList()))
+	start = time.Now()
 	detail, err := c.Detail(ctx, &pbnews.DetailRequest{URL: r.GetList()[0].Link})
 	if err != nil {
 		log.Fatalf("could not greet2: %v", err)
 	}
-	log.Printf("detail: %s", detail)
+	log.Printf("detail: time: %s, %s", time.Since(start), detail)
 
 }

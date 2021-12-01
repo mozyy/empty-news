@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"strings"
+	"time"
 
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
@@ -57,13 +58,18 @@ func main() {
 // the token is missing or invalid, the interceptor blocks execution of the
 // handler and returns an error. Otherwise, the interceptor invokes the unary
 // handler.
-func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
+func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handlers grpc.UnaryHandler) (interface{}, error) {
 	// The keys within metadata.MD are normalized to lowercase.
 	// See: https://godoc.org/google.golang.org/grpc/metadata#New
 	// if !valid(md["authorization"]) {
 	// 	return nil, errInvalidToken
 	// }
-	log.Println("recive method: ", info.FullMethod)
+	start := time.Now()
+	var handler grpc.UnaryHandler = func(ctx context.Context, req interface{}) (interface{}, error) {
+		result, err := handlers(ctx, req)
+		log.Printf("recive method: %s, time: %s, now: %s\n", info.FullMethod, time.Since(start), time.Now())
+		return result, err
+	}
 	apiScopes := []string{}
 	for _, api := range *conf.Apis {
 		if api.Api == info.FullMethod {

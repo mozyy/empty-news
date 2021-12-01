@@ -39,9 +39,10 @@ var listResponse = new(SafeList)
 
 // List is a single request handler called via client.Call or the generated client code
 func (e *news) List(ctx context.Context, req *emptypb.Empty) (*pbnews.ListResponse, error) {
-	log.Println("Received Empty.NewsList request")
+	start := time.Now()
 	// 接口有点慢, 缓存五分钟的结果
 	if listResponse.Get() != nil {
+		log.Println("news.News/List cache: ", time.Since(start))
 		return listResponse.Get(), nil
 	}
 	res := &pbnews.ListResponse{}
@@ -55,6 +56,7 @@ func (e *news) List(ctx context.Context, req *emptypb.Empty) (*pbnews.ListRespon
 			listResponse.Set(nil)
 		}()
 	}
+	log.Println("news.News/List get: ", time.Since(start))
 	return res, err
 }
 
