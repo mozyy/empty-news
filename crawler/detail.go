@@ -6,7 +6,7 @@ import (
 )
 
 // Detail get news detail
-func Detail(url string) (response *pbnews.DetailResponse, err error) {
+func Detail(link string) (response *pbnews.DetailResponse, err error) {
 	c := colly.NewCollector(
 	// colly.AllowedDomains("cnbeta.com"),
 	)
@@ -31,6 +31,6 @@ func Detail(url string) (response *pbnews.DetailResponse, err error) {
 	c.OnError(func(res *colly.Response, e error) {
 		err = e
 	})
-	c.Visit(url)
+	c.Visit("https://m.cnbeta.com/view/" + link + ".htm")
 	return
 }

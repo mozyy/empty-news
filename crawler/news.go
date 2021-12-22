@@ -23,7 +23,7 @@ func News() (items []*pbnews.NewsItem, err error) {
 					view, _ := strconv.Atoi(li.ChildText(".ico_view"))
 					comment, _ := strconv.Atoi(li.ChildText(".ico_comment"))
 					list = append(list, &pbnews.NewsItem{
-						Link:    li.Request.AbsoluteURL(li.ChildAttr(".txt_area a", "href")),
+						Link:    li.ChildAttr(".txt_area a", "href")[6:13], // /view/1217435.htm => 1217435
 						Image:   li.ChildAttr("img", "src"),
 						Title:   li.ChildText(".txt_detail"),
 						Time:    li.ChildText(".ico_time"),
