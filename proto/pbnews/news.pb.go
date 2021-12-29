@@ -8,14 +8,16 @@ package pbnews
 
 import (
 	context "context"
+	reflect "reflect"
+	sync "sync"
+
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
-	reflect "reflect"
-	sync "sync"
+	"gorm.io/gorm"
 )
 
 const (
@@ -298,6 +300,8 @@ type DetailResponse_DetailContent struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
+	gorm.Model
+	NewsDetailID uint
 	Type    int32  `protobuf:"varint,1,opt,name=type,proto3" json:"type,omitempty"`
 	Content string `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
 }

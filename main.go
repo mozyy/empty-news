@@ -67,7 +67,7 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	start := time.Now()
 	var handler grpc.UnaryHandler = func(ctx context.Context, req interface{}) (interface{}, error) {
 		result, err := handlers(ctx, req)
-		log.Printf("recive method: %s, time: %s, now: %s\n", info.FullMethod, time.Since(start), time.Now())
+		log.Printf("\t%s\t%s\n", info.FullMethod, time.Since(start))
 		return result, err
 	}
 	apiScopes := []string{}
