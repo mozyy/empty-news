@@ -13,6 +13,9 @@ var dbs = make(map[string]*sql.DB, 10)
 func NewDsn(dbname string) string {
 	return os.Getenv("mysql_dsn") + dbname + "?parseTime=true"
 }
+func NewPGDsn(dbname string) string {
+	return os.Getenv("postgresql_dsn") + dbname
+}
 
 func New(table string) *sql.DB {
 	if db, ok := dbs[table]; ok && db.Ping() != nil {

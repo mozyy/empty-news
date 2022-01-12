@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"gorm.io/driver/mysql"
+	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
@@ -22,8 +22,8 @@ var defaultConfig = &gorm.Config{
 }
 
 func NewGorm(dbname string) *gorm.DB {
-	d := mysql.New(mysql.Config{
-		DSN: NewDsn(dbname),
+	d := postgres.New(postgres.Config{
+		DSN: NewPGDsn(dbname),
 	})
 
 	db, err := gorm.Open(d, defaultConfig)

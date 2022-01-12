@@ -23,7 +23,7 @@ require (
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	github.com/tidwall/buntdb v1.2.4 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9
+	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519
 	golang.org/x/net v0.0.0-20210614182718-04defd469f4e // indirect
 	golang.org/x/oauth2 v0.0.0-20210427180440-81ed05c6b58c
 	golang.org/x/sys v0.0.0-20210616094352-59db8d763f22 // indirect
@@ -32,7 +32,7 @@ require (
 	google.golang.org/grpc v1.40.0
 	google.golang.org/protobuf v1.26.0
 	gorm.io/driver/mysql v1.1.2
-	gorm.io/gorm v1.21.13
+	gorm.io/gorm v1.22.3
 )
 
 require (
@@ -46,5 +46,5 @@ require (
 	github.com/tidwall/match v1.0.3 // indirect
 	github.com/tidwall/rtred v0.1.2 // indirect
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
-	golang.org/x/text v0.3.6 // indirect
+	gorm.io/driver/postgres v1.2.3
 )
