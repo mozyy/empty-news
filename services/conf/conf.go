@@ -12,8 +12,8 @@ type conf struct {
 
 func New() *conf {
 	dbGorm := db.NewGorm("e_user")
-	if !dbGorm.Migrator().HasTable(&pbmodel.ConfORM{}) {
-		if err := dbGorm.Migrator().CreateTable(&pbmodel.ConfORM{}); err != nil {
+	if !dbGorm.Migrator().HasTable(&pbmodel.ConfGORM{}) {
+		if err := dbGorm.Migrator().CreateTable(&pbmodel.ConfGORM{}); err != nil {
 			panic(err)
 		}
 	}

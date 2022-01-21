@@ -16,7 +16,7 @@ type Client struct {
 	*gorm.DB
 }
 type Oauth2Client struct {
-	pbmodel.OAuthClientORM
+	pbmodel.OAuthClientGORM
 }
 
 func NewClient() *Client {

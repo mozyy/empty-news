@@ -14,7 +14,7 @@ import (
 type UserStore struct {
 	*gorm.DB
 }
-type Oauth2User = pbmodel.UserORM
+type Oauth2User = pbmodel.UserGORM
 
 func NewUserStore() *UserStore {
 	dbGorm := db.NewGorm("e_user")

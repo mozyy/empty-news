@@ -18,12 +18,13 @@ type news struct {
 	sync.Mutex
 	newsList *pbnews.ListResponse
 	dbGorm   *gorm.DB
+	pbnews.UnimplementedNewsServer
 }
 
 func New() pbnews.NewsServer {
 	dbGorm := db.NewGorm("e_user")
 	dbGorm.AutoMigrate(&newsDetail{})
-	dbGorm.AutoMigrate(&pbnews.DetailResponse_DetailContent{})
+	dbGorm.AutoMigrate(&pbnews.DetailResponse_DetailContentGORM{})
 	return &news{dbGorm: dbGorm}
 }
 
@@ -40,26 +41,27 @@ func (e *news) GetNewsList() *pbnews.ListResponse {
 }
 
 type newsDetail struct {
-	gorm.Model
-	No string
-	pbnews.DetailResponse
+	pbnews.DetailResponseGORM
 }
 
-func (e *news) SetNewsDetails(No string, resp *pbnews.DetailResponse) {
-	res := e.dbGorm.Create(&newsDetail{No: No, DetailResponse: *resp})
+func (e *news) SetNewsDetails(No string, resp *pbnews.DetailResponse, ctx context.Context) {
+	v := &newsDetail{DetailResponseGORM: *resp.ToORM(ctx)}
+	v.No = No
+	res := e.dbGorm.Create(v)
 	if res.Error != nil {
 		log.Println("insert db error: ", res.Error)
 	}
 }
 
-func (e *news) GetNewsDetails(No string) (*pbnews.DetailResponse, error) {
+func (e *news) GetNewsDetails(No string, ctx context.Context) (*pbnews.DetailResponse, error) {
 	d := &newsDetail{}
-	err := e.dbGorm.Preload("Content").First(d, &newsDetail{No: No})
+	d.No = No
+	err := e.dbGorm.Preload("Content").First(d, d)
 	// err := e.dbGorm.First(d, &newsDetail{No: No})
 	if err.Error != nil {
 		return nil, err.Error
 	}
-	return &d.DetailResponse, nil
+	return d.DetailResponseGORM.ToPB(ctx), nil
 }
 
 // List is a single request handler called via client.Call or the generated client code
@@ -96,13 +98,13 @@ func (e *news) List(ctx context.Context, req *emptypb.Empty) (*pbnews.ListRespon
 
 // NewsList is a single request handler called via client.Call or the generated client code
 func (e *news) Detail(ctx context.Context, req *pbnews.DetailRequest) (*pbnews.DetailResponse, error) {
-	resDb, err := e.GetNewsDetails(req.GetURL())
+	resDb, err := e.GetNewsDetails(req.GetURL(), ctx)
 	if err == nil {
 		return resDb, nil
 	}
 	res, err := crawler.Detail(req.GetURL())
 	go func() {
-		e.SetNewsDetails(req.GetURL(), res)
+		e.SetNewsDetails(req.GetURL(), res, ctx)
 	}()
 	return res, err
 }

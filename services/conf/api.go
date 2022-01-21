@@ -8,32 +8,32 @@ import (
 
 var (
 	dbGorm *gorm.DB
-	Apis   *[]pbmodel.ConfApiORM
+	Apis   *[]pbmodel.ConfApiGORM
 )
 
 func init() {
 	dbGorm = db.NewGorm("e_user")
-	if !dbGorm.Migrator().HasTable(&pbmodel.ConfApiORM{}) {
-		if err := dbGorm.Migrator().CreateTable(&pbmodel.ConfApiORM{}); err != nil {
+	if !dbGorm.Migrator().HasTable(&pbmodel.ConfApiGORM{}) {
+		if err := dbGorm.Migrator().CreateTable(&pbmodel.ConfApiGORM{}); err != nil {
 			panic(err)
 		}
 	}
 	SetApis()
 }
 
-func CreateApi(payload *pbmodel.ConfApiORM) error {
+func CreateApi(payload *pbmodel.ConfApiGORM) error {
 	res := dbGorm.Create(payload)
 	SetApis()
 	return res.Error
 }
 
-func ListApi(api *pbmodel.ConfApiORM) (*[]pbmodel.ConfApiORM, error) {
-	apis := []pbmodel.ConfApiORM{}
+func ListApi(api *pbmodel.ConfApiGORM) (*[]pbmodel.ConfApiGORM, error) {
+	apis := []pbmodel.ConfApiGORM{}
 	res := dbGorm.Where(api).Find(&apis)
 	return &apis, res.Error
 }
 func SetApis() {
-	apis, err := ListApi(&pbmodel.ConfApiORM{})
+	apis, err := ListApi(&pbmodel.ConfApiGORM{})
 	if err != nil {
 		panic(err)
 	}

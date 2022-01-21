@@ -15,6 +15,7 @@ import (
 
 type User struct {
 	user *UserStore
+	pbuser.UnimplementedUserServer
 }
 
 func New() *User {
