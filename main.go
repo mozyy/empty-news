@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -9,13 +10,15 @@ import (
 	"strings"
 	"time"
 
+	"github.com/mozyy/empty-news/proto/pbmanage"
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
 	"github.com/mozyy/empty-news/services/conf"
+	"github.com/mozyy/empty-news/services/manage"
 	"github.com/mozyy/empty-news/services/news"
 	"github.com/mozyy/empty-news/services/oauth"
 	"github.com/mozyy/empty-news/services/user"
-	"github.com/mozyy/empty-news/utils/errors"
+	uerrors "github.com/mozyy/empty-news/utils/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )
@@ -67,7 +70,13 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	start := time.Now()
 	var handler grpc.UnaryHandler = func(ctx context.Context, req interface{}) (interface{}, error) {
 		result, err := handlers(ctx, req)
-		log.Printf("\t%s\t%s\n", info.FullMethod, time.Since(start))
+		log.Printf("%s\t%s\n", info.FullMethod, time.Since(start))
+		if err != nil {
+			log.Printf("[error]:%s\t%s, %v\n", info.FullMethod, err, req)
+			if errors.Is(&uerrors.Error{}, err) {
+				return result, errors.Unwrap(err)
+			}
+		}
 		return result, err
 	}
 	apiScopes := []string{}
@@ -82,22 +91,22 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		return nil, errors.ErrInvalidToken
+		return nil, uerrors.ErrInvalidToken
 	}
 	authorization := md["authorization"]
 
 	if len(authorization) < 1 {
-		return nil, errors.ErrInvalidToken
+		return nil, uerrors.ErrInvalidToken
 	}
 	access := strings.TrimPrefix(authorization[0], "Bearer ")
 
 	token, err := oauth.TokenStore.GetByAccess(ctx, access)
 	if err != nil {
-		return nil, errors.ErrInvalidToken
+		return nil, uerrors.ErrInvalidToken
 	}
 	// 重启后用老的token会异常
 	if token == nil {
-		return nil, errors.ErrInvalidToken
+		return nil, uerrors.ErrInvalidToken
 	}
 	scopeStr := token.GetScope()
 	userScopes := strings.Split(scopeStr, " ")
@@ -112,7 +121,7 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 			}
 		}
 	}
-	return nil, errors.ErrPermissionDenied
+	return nil, uerrors.ErrPermissionDenied
 }
 
 func register(grpcServer *grpc.Server) {
@@ -120,4 +129,5 @@ func register(grpcServer *grpc.Server) {
 	pbnews.RegisterNewsServer(grpcServer, news.New())
 	// pbuser.RegisterUserServer(grpcServer, user.New())
 	pbuser.RegisterUserServer(grpcServer, user.New())
+	pbmanage.RegisterSourcesServer(grpcServer, manage.New())
 }
