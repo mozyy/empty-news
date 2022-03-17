@@ -1,6 +1,7 @@
 package oauth
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -59,7 +60,7 @@ func New() {
 
 	userStore := user.NewUserStore()
 
-	srv.SetPasswordAuthorizationHandler(func(mobile, password string) (ID string, err error) {
+	srv.SetPasswordAuthorizationHandler(func(ctx context.Context, mobile, password string) (ID string, err error) {
 		user, err := userStore.Get(mobile, password)
 		if err != nil {
 			return

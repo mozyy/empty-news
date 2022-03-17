@@ -6,12 +6,12 @@ services:
       context: .
       dockerfile: Dockerfile
       args:
-        # Update the VARIANT arg to pick a version of Go: 1, 1.16, 1.15
-        - VARIANT=1
+        # Update the VARIANT arg to pick a version of Go: 1, 1.18, 1.17
+        - VARIANT=1.18
         # Options
         - INSTALL_NODE=false
         - NODE_VERSION="lts/*"
-        - USE_MOBY=true # go 1.17 not install moby-cli
+        # - USE_MOBY=true # go 1.17 not install moby-cli
 
     init: true
     volumes:
