@@ -6,7 +6,7 @@
     "dockerfile": "Dockerfile",
     // Update the VARIANT arg to pick a version of Go: 1, 1.18, 1.17
     "args": {
-      "VARIANT": "1.18"
+      // "VARIANT": "1.18"
     }
   },
   // Use this environment variable if you need to bind mount your local source code into a new container.
