@@ -68,7 +68,7 @@ static_resources:
             - endpoint:
                 address:
                   socket_address:
-                    address: app
+                    address: localhost
                     port_value: 50051
   - name: interop_oauth2
     connect_timeout: 0.25s
@@ -82,5 +82,5 @@ static_resources:
             - endpoint:
                 address:
                   socket_address:
-                    address: app
+                    address: localhost
                     port_value: 9096

@@ -24,7 +24,6 @@ type news struct {
 func New() pbnews.NewsServer {
 	dbGorm := db.NewGorm("e_user")
 	dbGorm.AutoMigrate(&newsDetail{})
-	dbGorm.AutoMigrate(&pbnews.DetailResponse_DetailContentGORM{})
 	return &news{dbGorm: dbGorm}
 }
 

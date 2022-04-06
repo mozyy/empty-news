@@ -22,6 +22,8 @@ RUN if [ "${INSTALL_NODE}" = "true" ]; then su vscode -c "umask 0002 && . /usr/l
 RUN apt-get update
 
 # ------------ docker -----------
+# https://github.com/microsoft/vscode-dev-containers/blob/main/containers/docker-from-docker/.devcontainer/Dockerfile
+
 # [Option] Install zsh
 ARG INSTALL_ZSH="true"
 # [Option] Upgrade OS packages to their latest versions
@@ -60,6 +62,39 @@ CMD [ "sleep", "infinity" ]
 #     && apt-get -y install --no-install-recommends <your-package-list-here>
 
 # ------------ docker -----------
+
+# --------------- custom ------
+
+ARG PROTOC_VERSION=3.20.0
+ARG PROTOC_ZIP=protoc-${PROTOC_VERSION}-linux-x86_64.zip
+
+RUN curl -OL https://github.com/protocolbuffers/protobuf/releases/download/v${PROTOC_VERSION}/${PROTOC_ZIP} && \
+    unzip $PROTOC_ZIP -d ~/.local && \
+    rm -f $PROTOC_ZIP
+
+ARG PROTOC_WEB_VERSION=1.3.1
+ARG PROTOC_WEB_ZIP=protoc-gen-grpc-web-${PROTOC_WEB_VERSION}-linux-x86_64
+
+RUN curl -L -o /usr/local/bin/protoc-gen-grpc-web https://github.com/grpc/grpc-web/releases/download/${PROTOC_WEB_VERSION}/${PROTOC_WEB_ZIP} && \
+    chmod +x /usr/local/bin/protoc-gen-grpc-web
+
+# [Optional] Uncomment this section to install additional OS packages.
+# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+#     && apt-get -y install --no-install-recommends <your-package-list-here>
+
+ARG ANGULAR_CLI_VERSION=latest
+# [Optional] Uncomment this line to install global node packages.
+# RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
+RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g @angular/cli@${ANGULAR_CLI_VERSION}" 2>&1
+
+ARG PROTOC_GEN_GO_VERSION=latest
+ARG PROTOC_GEN_GO_GRPC_VERSION=latest
+ARG PROTOC_GEN_GORM_VERSION=latest
+RUN go install google.golang.org/protobuf/cmd/protoc-gen-go@$PROTOC_GEN_GO_VERSION &&\
+    go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$PROTOC_GEN_GO_GRPC_VERSION &&\
+    go install github.com/mozyy/protoc-gen-gorm@$PROTOC_GEN_GORM_VERSION
+# go install github.com/micro/micro/v3/cmd/protoc-gen-micro && \
+# go install github.com/micro/micro/v3/cmd/protoc-gen-openapi
 
 ENV GOCACHE=/workspaces/cache/go_cache
 ENV GOMODCACHE=/workspaces/cache/go_mod_cache
