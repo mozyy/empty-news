@@ -22,12 +22,12 @@ require (
 	github.com/temoto/robotstxt v1.1.2 // indirect
 	github.com/tidwall/buntdb v1.2.9 // indirect
 	github.com/tidwall/pretty v1.2.0 // indirect
-	golang.org/x/crypto v0.0.0-20220331220935-ae2d96664a29
-	golang.org/x/net v0.0.0-20220403103023-749bd193bc2b // indirect
-	golang.org/x/oauth2 v0.0.0-20220309155454-6242fa91716a
-	golang.org/x/sys v0.0.0-20220405210540-1e041c57c461 // indirect
+	golang.org/x/crypto v0.0.0-20220411220226-7b82a4e95df4
+	golang.org/x/net v0.0.0-20220412020605-290c469a71a5 // indirect
+	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5
+	golang.org/x/sys v0.0.0-20220412211240-33da011f77ad // indirect
 	google.golang.org/appengine v1.6.7 // indirect
-	google.golang.org/genproto v0.0.0-20220405205423-9d709892a2bf // indirect
+	google.golang.org/genproto v0.0.0-20220407144326-9054f6ed7bac // indirect
 	google.golang.org/grpc v1.45.0
 	google.golang.org/protobuf v1.28.0
 	gorm.io/gorm v1.23.4
@@ -37,13 +37,13 @@ require (
 	github.com/gogo/protobuf v1.3.2
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/mozyy/protoc-gen-gorm v0.1.1
-	github.com/tidwall/btree v1.2.1 // indirect
+	github.com/tidwall/btree v1.2.2 // indirect
 	github.com/tidwall/gjson v1.14.0 // indirect
 	github.com/tidwall/grect v0.1.4 // indirect
 	github.com/tidwall/match v1.1.1 // indirect
 	github.com/tidwall/rtred v0.1.2 // indirect
 	github.com/tidwall/tinyqueue v0.1.1 // indirect
-	gorm.io/driver/postgres v1.3.3
+	gorm.io/driver/postgres v1.3.4
 )
 
 require (
