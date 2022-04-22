@@ -23,8 +23,10 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SourcesClient interface {
-	Create(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	Create(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*SourcesItem, error)
+	Update(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*SourcesItem, error)
 	List(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*ListResponse, error)
+	Delete(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type sourcesClient struct {
@@ -35,9 +37,18 @@ func NewSourcesClient(cc grpc.ClientConnInterface) SourcesClient {
 	return &sourcesClient{cc}
 }
 
-func (c *sourcesClient) Create(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
+func (c *sourcesClient) Create(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*SourcesItem, error) {
+	out := new(SourcesItem)
 	err := c.cc.Invoke(ctx, "/manage.Sources/Create", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sourcesClient) Update(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*SourcesItem, error) {
+	out := new(SourcesItem)
+	err := c.cc.Invoke(ctx, "/manage.Sources/Update", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -53,12 +64,23 @@ func (c *sourcesClient) List(ctx context.Context, in *SourcesItem, opts ...grpc.
 	return out, nil
 }
 
+func (c *sourcesClient) Delete(ctx context.Context, in *SourcesItem, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/manage.Sources/Delete", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SourcesServer is the server API for Sources service.
 // All implementations must embed UnimplementedSourcesServer
 // for forward compatibility
 type SourcesServer interface {
-	Create(context.Context, *SourcesItem) (*emptypb.Empty, error)
+	Create(context.Context, *SourcesItem) (*SourcesItem, error)
+	Update(context.Context, *SourcesItem) (*SourcesItem, error)
 	List(context.Context, *SourcesItem) (*ListResponse, error)
+	Delete(context.Context, *SourcesItem) (*emptypb.Empty, error)
 	mustEmbedUnimplementedSourcesServer()
 }
 
@@ -66,11 +88,17 @@ type SourcesServer interface {
 type UnimplementedSourcesServer struct {
 }
 
-func (UnimplementedSourcesServer) Create(context.Context, *SourcesItem) (*emptypb.Empty, error) {
+func (UnimplementedSourcesServer) Create(context.Context, *SourcesItem) (*SourcesItem, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
+}
+func (UnimplementedSourcesServer) Update(context.Context, *SourcesItem) (*SourcesItem, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
 }
 func (UnimplementedSourcesServer) List(context.Context, *SourcesItem) (*ListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedSourcesServer) Delete(context.Context, *SourcesItem) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
 }
 func (UnimplementedSourcesServer) mustEmbedUnimplementedSourcesServer() {}
 
@@ -103,6 +131,24 @@ func _Sources_Create_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Sources_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourcesItem)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourcesServer).Update(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/manage.Sources/Update",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourcesServer).Update(ctx, req.(*SourcesItem))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Sources_List_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SourcesItem)
 	if err := dec(in); err != nil {
@@ -121,6 +167,24 @@ func _Sources_List_Handler(srv interface{}, ctx context.Context, dec func(interf
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Sources_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SourcesItem)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SourcesServer).Delete(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/manage.Sources/Delete",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SourcesServer).Delete(ctx, req.(*SourcesItem))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Sources_ServiceDesc is the grpc.ServiceDesc for Sources service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -133,8 +197,16 @@ var Sources_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Sources_Create_Handler,
 		},
 		{
+			MethodName: "Update",
+			Handler:    _Sources_Update_Handler,
+		},
+		{
 			MethodName: "List",
 			Handler:    _Sources_List_Handler,
+		},
+		{
+			MethodName: "Delete",
+			Handler:    _Sources_Delete_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

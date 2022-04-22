@@ -30,25 +30,43 @@ func New() *Manage {
 
 // m *Manage pbmanage.SourcesServer
 
-func (m *Manage) Create(ctx context.Context, sources *pbmanage.SourcesItem) (*emptypb.Empty, error) {
+func (m *Manage) Create(ctx context.Context, sources *pbmanage.SourcesItem) (*pbmanage.SourcesItem, error) {
 	src := sources.ToORM(ctx)
 	result := m.DB.Create(src)
 	if result.Error != nil {
 		return nil, m.Err(result.Error, "创建资源失败")
 	}
-	return &emptypb.Empty{}, nil
+	return &pbmanage.SourcesItem{}, nil
 }
+func (m *Manage) Update(ctx context.Context, sources *pbmanage.SourcesItem) (*pbmanage.SourcesItem, error) {
+	src := sources.ToORM(ctx)
+	result := m.DB.Create(src)
+	if result.Error != nil {
+		return nil, m.Err(result.Error, "创建资源失败")
+	}
+	return &pbmanage.SourcesItem{}, nil
+}
+
 func (m *Manage) List(ctx context.Context, req *pbmanage.SourcesItem) (*pbmanage.ListResponse, error) {
 	list := &[]*pbmanage.SourcesItemGORM{}
 	fmt.Println(req, req.ToORM(ctx))
-	err := m.DB.Model(req.ToORM(ctx)).Where(req.ToORM(ctx)).Association("Children").Find(list)
+	err := m.DB.Model(req.ToORM(ctx)).Preload("Children").Where("sources_item_id IS NULL").Where(req.ToORM(ctx)).Find(list)
 	resp := &pbmanage.ListResponse{}
-	if err != nil {
-		return resp, m.Err(err, "获取列表失败")
+	if err.Error != nil {
+		return resp, m.Err(err.Error, "获取列表失败")
 	}
 
 	for _, v := range *list {
 		resp.List = append(resp.List, v.ToPB(ctx))
 	}
 	return resp, nil
+}
+
+func (m *Manage) Delete(ctx context.Context, sources *pbmanage.SourcesItem) (*emptypb.Empty, error) {
+	src := sources.ToORM(ctx)
+	result := m.DB.Create(src)
+	if result.Error != nil {
+		return nil, m.Err(result.Error, "创建资源失败")
+	}
+	return &emptypb.Empty{}, nil
 }

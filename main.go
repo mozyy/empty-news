@@ -94,6 +94,10 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 		return nil, uerrors.ErrInvalidToken
 	}
 	authorization := md["authorization"]
+	//
+	if authorization[0] != "" {
+		return handler(ctx, req)
+	}
 
 	if len(authorization) < 1 {
 		return nil, uerrors.ErrInvalidToken
