@@ -8,7 +8,6 @@ package pbuser
 
 import (
 	context "context"
-	pbmodel "github.com/mozyy/empty-news/proto/pbmodel"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -24,8 +23,8 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserClient interface {
-	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*pbmodel.OAuthToken, error)
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*pbmodel.OAuthToken, error)
+	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*OAuthToken, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*OAuthToken, error)
 	Info(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*InfoResponse, error)
 }
 
@@ -37,8 +36,8 @@ func NewUserClient(cc grpc.ClientConnInterface) UserClient {
 	return &userClient{cc}
 }
 
-func (c *userClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*pbmodel.OAuthToken, error) {
-	out := new(pbmodel.OAuthToken)
+func (c *userClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*OAuthToken, error) {
+	out := new(OAuthToken)
 	err := c.cc.Invoke(ctx, "/user.User/Register", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -46,8 +45,8 @@ func (c *userClient) Register(ctx context.Context, in *RegisterRequest, opts ...
 	return out, nil
 }
 
-func (c *userClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*pbmodel.OAuthToken, error) {
-	out := new(pbmodel.OAuthToken)
+func (c *userClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*OAuthToken, error) {
+	out := new(OAuthToken)
 	err := c.cc.Invoke(ctx, "/user.User/Login", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -68,8 +67,8 @@ func (c *userClient) Info(ctx context.Context, in *emptypb.Empty, opts ...grpc.C
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
-	Register(context.Context, *RegisterRequest) (*pbmodel.OAuthToken, error)
-	Login(context.Context, *LoginRequest) (*pbmodel.OAuthToken, error)
+	Register(context.Context, *RegisterRequest) (*OAuthToken, error)
+	Login(context.Context, *LoginRequest) (*OAuthToken, error)
 	Info(context.Context, *emptypb.Empty) (*InfoResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
@@ -78,10 +77,10 @@ type UserServer interface {
 type UnimplementedUserServer struct {
 }
 
-func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*pbmodel.OAuthToken, error) {
+func (UnimplementedUserServer) Register(context.Context, *RegisterRequest) (*OAuthToken, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
-func (UnimplementedUserServer) Login(context.Context, *LoginRequest) (*pbmodel.OAuthToken, error) {
+func (UnimplementedUserServer) Login(context.Context, *LoginRequest) (*OAuthToken, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
 func (UnimplementedUserServer) Info(context.Context, *emptypb.Empty) (*InfoResponse, error) {

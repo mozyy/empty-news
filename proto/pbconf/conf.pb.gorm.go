@@ -8,7 +8,7 @@ package pbconf
 
 import (
 	context "context"
-	pbmodel "github.com/mozyy/empty-news/proto/pbmodel"
+	pbuser "github.com/mozyy/empty-news/proto/pbuser"
 	_ "github.com/mozyy/protoc-gen-gorm/options"
 	types "github.com/mozyy/protoc-gen-gorm/types"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -30,7 +30,7 @@ type ConfigGORM struct {
 	Value      string
 	Content    string
 	Desc       string
-	OAuthToken *pbmodel.OAuthTokenGORM
+	OAuthToken *pbuser.OAuthTokenGORM
 	CreatedAt  *time.Time
 	UpdatedAt  *time.Time
 	DeletedAt  *types.DeletedAt `gorm:"index"`

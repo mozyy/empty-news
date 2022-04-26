@@ -39,8 +39,6 @@ func New() {
 
 	manager := manage.NewDefaultManager()
 
-	manager.SetAuthorizeCodeTokenCfg(manage.DefaultAuthorizeCodeTokenCfg)
-
 	// use mysql token store
 	// manager.MapTokenStorage(NewStoreToken())
 	tokenStore, err := store.NewMemoryTokenStore()
@@ -54,7 +52,7 @@ func New() {
 	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("00000000"), jwt.SigningMethodHS512))
 	// manager.MapAccessGenerate(generates.NewAccessGenerate())
 
-	manager.MapClientStorage(NewClient())
+	manager.MapClientStorage(NewStoreClient())
 
 	srv := server.NewServer(server.NewConfig(), manager)
 

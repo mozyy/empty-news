@@ -3,212 +3,202 @@ package oauth
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"io"
-	"os"
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/models"
+	"github.com/mozyy/empty-news/proto/pbuser"
 	"github.com/mozyy/empty-news/utils/db"
+	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
 )
 
 // Oauth2Token data item
 type Oauth2Token struct {
-	gorm.Model
+	*pbuser.OAuthToken
+}
 
-	ExpiredAt int64
-	Code      string `gorm:"type:varchar(512)"`
-	Access    string `gorm:"type:varchar(512)"`
-	Refresh   string `gorm:"type:varchar(512)"`
-	Data      string `gorm:"type:text"`
+// o Oauth2Token oauth2.TokenInfo
+
+func (o Oauth2Token) SetClientID(value string) {
+	o.ClientID = value
+}
+
+func (o Oauth2Token) SetUserID(value string) {
+	o.UserID = value
+}
+
+func (o Oauth2Token) SetRedirectURI(value string) {
+	o.RedirectURI = value
+}
+
+func (o Oauth2Token) SetScope(value string) {
+	o.Scope = value
+}
+
+func (o Oauth2Token) SetCode(value string) {
+	o.Code = value
+}
+
+func (o Oauth2Token) SetCodeCreateAt(value time.Time) {
+	o.AccessCreateAt = timestamppb.New(value)
+}
+
+func (o Oauth2Token) SetCodeExpiresIn(value time.Duration) {
+	o.CodeExpiresIn = int64(value)
+}
+
+func (o Oauth2Token) SetCodeChallenge(value string) {
+	o.CodeChallenge = value
+}
+
+func (o Oauth2Token) SetCodeChallengeMethod(value oauth2.CodeChallengeMethod) {
+	o.CodeChallengeMethod = string(value)
+}
+
+func (o Oauth2Token) SetAccess(value string) {
+	o.Access = value
+}
+
+func (o Oauth2Token) SetAccessCreateAt(value time.Time) {
+	o.AccessCreateAt = timestamppb.New(value)
+}
+
+func (o Oauth2Token) SetAccessExpiresIn(value time.Duration) {
+	o.AccessExpiresIn = int64(value)
+}
+
+func (o Oauth2Token) SetRefresh(value string) {
+	o.Refresh = value
+}
+
+func (o Oauth2Token) SetRefreshCreateAt(value time.Time) {
+	o.RefreshCreateAt = timestamppb.New(value)
+}
+
+func (o Oauth2Token) SetRefreshExpiresIn(value time.Duration) {
+	o.RefreshExpiresIn = int64(value)
+}
+
+func (o Oauth2Token) GetAccessCreateAt() time.Time {
+	return o.AccessCreateAt.AsTime()
+}
+func (o Oauth2Token) GetAccessExpiresIn() time.Duration {
+	return time.Duration(o.AccessExpiresIn)
+}
+func (o Oauth2Token) GetCodeChallengeMethod() oauth2.CodeChallengeMethod {
+	return oauth2.CodeChallengeMethod(o.CodeChallengeMethod)
+}
+func (o Oauth2Token) GetCodeCreateAt() time.Time {
+	return o.CodeCreateAt.AsTime()
+}
+func (o Oauth2Token) GetCodeExpiresIn() time.Duration {
+	return time.Duration(o.CodeExpiresIn)
+}
+
+func (o Oauth2Token) GetRefreshCreateAt() time.Time {
+	return o.RefreshCreateAt.AsTime()
+}
+func (o Oauth2Token) GetRefreshExpiresIn() time.Duration {
+	return time.Duration(o.RefreshExpiresIn)
+}
+func (o Oauth2Token) New() oauth2.TokenInfo {
+	return Oauth2Token{
+		OAuthToken: o.ToORM(context.Background()).ToPB(context.Background()),
+	}
 }
 
 // NewStoreToken create mysql store instance,
 func NewStoreToken() *StoreToken {
 
 	dbGorm := db.NewGorm("e_user")
+	dbGorm.AutoMigrate(&pbuser.OAuthTokenGORM{})
 
-	return NewStoreWithDB(dbGorm)
-}
-
-func NewStoreWithDB(db *gorm.DB) *StoreToken {
-	store := &StoreToken{
-		db:     db,
-		stdout: os.Stderr,
-	}
-	interval := 600
-
-	store.ticker = time.NewTicker(time.Second * time.Duration(interval))
-
-	if !db.Migrator().HasTable(Oauth2Token{}) {
-		if err := db.Migrator().CreateTable(&Oauth2Token{}); err != nil {
-			panic(err)
-		}
-	}
-
-	go store.gc()
-	return store
+	return &StoreToken{dbGorm}
 }
 
 // StoreToken mysql token store
 type StoreToken struct {
-	db     *gorm.DB
-	stdout io.Writer
-	ticker *time.Ticker
-}
-
-// SetStdout set error output
-func (s *StoreToken) SetStdout(stdout io.Writer) *StoreToken {
-	s.stdout = stdout
-	return s
-}
-
-// Close close the store
-func (s *StoreToken) Close() {
-	s.ticker.Stop()
-}
-
-func (s *StoreToken) errorf(format string, args ...interface{}) {
-	if s.stdout != nil {
-		buf := fmt.Sprintf(format, args...)
-		s.stdout.Write([]byte(buf))
-	}
-}
-
-func (s *StoreToken) gc() {
-	for range s.ticker.C {
-		now := time.Now().Unix()
-		var count int64
-		if err := s.db.Model(&Oauth2Token{}).Where("expired_at <= ?", now).Or("code = ? and access = ? AND refresh = ?", "", "", "").Count(&count).Error; err != nil {
-			s.errorf("[ERROR]:%s\n", err)
-			return
-		}
-		if count > 0 {
-			// not soft delete.
-			if err := s.db.Model(&Oauth2Token{}).Where("expired_at <= ?", now).Or("code = ? and access = ? AND refresh = ?", "", "", "").Unscoped().Delete(&Oauth2Token{}).Error; err != nil {
-				s.errorf("[ERROR]:%s\n", err)
-			}
-		}
-	}
+	*gorm.DB
 }
 
 // Create create and store the new token information
 func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
-	jv, err := json.Marshal(info)
-	if err != nil {
-		return err
-	}
-	item := &Oauth2Token{
-		Data: string(jv),
+	CodeCreateAt := info.GetCodeCreateAt()
+	AccessCreateAt := info.GetAccessCreateAt()
+	RefreshCreateAt := info.GetRefreshCreateAt()
+
+	token := &pbuser.OAuthTokenGORM{
+		ClientID:    info.GetClientID(),
+		UserID:      info.GetUserID(),
+		RedirectURI: info.GetRedirectURI(),
+		Scope:       info.GetScope(),
+
+		Code:                info.GetCode(),
+		CodeCreateAt:        &CodeCreateAt,
+		CodeExpiresIn:       int64(info.GetCodeExpiresIn()),
+		CodeChallenge:       info.GetCodeChallenge(),
+		CodeChallengeMethod: string(info.GetCodeChallengeMethod()),
+
+		Access:          info.GetAccess(),
+		AccessCreateAt:  &AccessCreateAt,
+		AccessExpiresIn: int64(info.GetAccessExpiresIn()),
+
+		Refresh:          info.GetRefresh(),
+		RefreshCreateAt:  &RefreshCreateAt,
+		RefreshExpiresIn: int64(info.GetRefreshExpiresIn()),
 	}
 
-	if code := info.GetCode(); code != "" {
-		item.Code = code
-		item.ExpiredAt = info.GetCodeCreateAt().Add(info.GetCodeExpiresIn()).Unix()
-	} else {
-		item.Access = info.GetAccess()
-		item.ExpiredAt = info.GetAccessCreateAt().Add(info.GetAccessExpiresIn()).Unix()
-
-		if refresh := info.GetRefresh(); refresh != "" {
-			item.Refresh = info.GetRefresh()
-			item.ExpiredAt = info.GetRefreshCreateAt().Add(info.GetRefreshExpiresIn()).Unix()
-		}
-	}
-
-	return s.db.WithContext(ctx).Create(item).Error
+	return s.DB.Create(token).Error
+}
+func (s *StoreToken) remove(ctx context.Context, query, value string) error {
+	return s.Where(query, value).Delete(&pbuser.OAuthTokenGORM{}).Error
 }
 
 // RemoveByCode delete the authorization code
 func (s *StoreToken) RemoveByCode(ctx context.Context, code string) error {
-	return s.db.WithContext(ctx).
-		Model(&Oauth2Token{}).
-		Where("code = ?", code).
-		Update("code", "").
-		Error
+	return s.remove(ctx, "code = ?", code)
 }
 
 // RemoveByAccess use the access token to delete the token information
 func (s *StoreToken) RemoveByAccess(ctx context.Context, access string) error {
-	return s.db.WithContext(ctx).
-		Model(&Oauth2Token{}).
-		Where("access = ?", access).
-		Update("access", "").
-		Error
+	return s.remove(ctx, "access = ?", access)
 }
 
 // RemoveByRefresh use the refresh token to delete the token information
 func (s *StoreToken) RemoveByRefresh(ctx context.Context, refresh string) error {
-	return s.db.WithContext(ctx).
-		Model(&Oauth2Token{}).
-		Where("refresh = ?", refresh).
-		Update("refresh", "").
-		Error
+	return s.remove(ctx, "refresh = ?", refresh)
 }
 
 func (s *StoreToken) toTokenInfo(data string) oauth2.TokenInfo {
-	var tm models.Token
+	var tm pbuser.OAuthTokenGORM
 	err := json.Unmarshal([]byte(data), &tm)
 	if err != nil {
 		return nil
 	}
-	return &tm
+	token := Oauth2Token{OAuthToken: tm.ToPB(context.Background())}
+	return token
+}
+
+func (s *StoreToken) get(ctx context.Context, query, code string) (oauth2.TokenInfo, error) {
+	token := pbuser.OAuthTokenGORM{}
+	res := s.Where(query, code).First(&token)
+	if res.Error != nil {
+		return Oauth2Token{}, res.Error
+	}
+	return Oauth2Token{OAuthToken: token.ToPB(ctx)}, nil
 }
 
 // GetByCode use the authorization code for token information data
 func (s *StoreToken) GetByCode(ctx context.Context, code string) (oauth2.TokenInfo, error) {
-	if code == "" {
-		return nil, nil
-	}
-
-	var item Oauth2Token
-	if err := s.db.WithContext(ctx).
-		Where("code = ?", code).
-		Find(&item).Error; err != nil {
-		return nil, err
-	}
-	if item.ID == 0 {
-		return nil, nil
-	}
-
-	return s.toTokenInfo(item.Data), nil
+	return s.get(ctx, "code = ?", code)
 }
 
 // GetByAccess use the access token for token information data
 func (s *StoreToken) GetByAccess(ctx context.Context, access string) (oauth2.TokenInfo, error) {
-	if access == "" {
-		return nil, nil
-	}
-
-	var item Oauth2Token
-	if err := s.db.WithContext(ctx).
-		Where("access = ?", access).
-		Find(&item).Error; err != nil {
-		return nil, err
-	}
-	if item.ID == 0 {
-		return nil, nil
-	}
-
-	return s.toTokenInfo(item.Data), nil
+	return s.get(ctx, "access = ?", access)
 }
 
 // GetByRefresh use the refresh token for token information data
 func (s *StoreToken) GetByRefresh(ctx context.Context, refresh string) (oauth2.TokenInfo, error) {
-	if refresh == "" {
-		return nil, nil
-	}
-
-	var item Oauth2Token
-	if err := s.db.WithContext(ctx).
-		Where("refresh = ?", refresh).
-		Find(&item).Error; err != nil {
-		return nil, err
-	}
-	if item.ID == 0 {
-		return nil, nil
-	}
-
-	return s.toTokenInfo(item.Data), nil
+	return s.get(ctx, "refresh = ?", refresh)
 }

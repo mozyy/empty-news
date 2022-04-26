@@ -6,7 +6,6 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mozyy/empty-news/proto/pbmodel"
 	"github.com/mozyy/empty-news/proto/pbuser"
 	"github.com/mozyy/empty-news/utils/errors"
 	"golang.org/x/oauth2"
@@ -22,17 +21,17 @@ func New() *User {
 	return &User{user: NewUserStore()}
 }
 
-func (a *User) Register(ctx context.Context, req *pbuser.RegisterRequest) (*pbmodel.OAuthToken, error) {
+func (a *User) Register(ctx context.Context, req *pbuser.RegisterRequest) (*pbuser.OAuthToken, error) {
 	_, err := a.user.Add(req.GetMobile(), req.GetPassword())
 	if err != nil {
-		return &pbmodel.OAuthToken{}, err
+		return &pbuser.OAuthToken{}, err
 	}
-	return &pbmodel.OAuthToken{}, err
+	return &pbuser.OAuthToken{}, err
 }
 
-func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbmodel.OAuthToken, error) {
+func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbuser.OAuthToken, error) {
 	if req.GetMobile() == "" || req.GetPassword() == "" {
-		return &pbmodel.OAuthToken{}, errors.ErrInvalidArgument
+		return &pbuser.OAuthToken{}, errors.ErrInvalidArgument
 	}
 	// httpClient := &http.Client{Timeout: 2 * time.Second}
 	// ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
@@ -54,9 +53,9 @@ func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbmodel.OA
 	}
 	log.Println("recive Login: ", time.Now())
 
-	return &pbmodel.OAuthToken{AccessToken: token.AccessToken,
-		TokenType: token.TokenType, RefreshToken: token.RefreshToken,
-		ExpiresSeconds: time.Until(token.Expiry).Seconds()}, nil
+	return &pbuser.OAuthToken{Access: token.AccessToken,
+		TokenType: token.TokenType, Refresh: token.RefreshToken,
+		AccessExpiresIn: int64(time.Until(token.Expiry).Seconds())}, nil
 }
 
 func (a *User) Info(_ context.Context, _ *emptypb.Empty) (*pbuser.InfoResponse, error) {

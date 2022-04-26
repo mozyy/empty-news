@@ -7,7 +7,6 @@
 package pbuser
 
 import (
-	_ "github.com/mozyy/empty-news/proto/pbmodel"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/known/emptypb"
 )
