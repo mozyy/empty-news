@@ -98,17 +98,15 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	if len(authorization) < 1 {
 		return nil, uerrors.ErrInvalidToken
 	}
-	access := strings.TrimPrefix(authorization[0], "Bearer ")
+	access := strings.TrimSpace(strings.TrimPrefix(authorization[0], "Bearer"))
 
-	token, err := oauth.TokenStore.GetByAccess(ctx, access)
-	if err != nil {
+	claims, err := oauth.ValidToken(access)
+
+	if err != nil || claims.Valid() != nil {
 		return nil, uerrors.ErrInvalidToken
 	}
-	// 重启后用老的token会异常
-	if token == nil {
-		return nil, uerrors.ErrInvalidToken
-	}
-	scopeStr := token.GetScope()
+
+	scopeStr := claims.Scope
 	userScopes := strings.Split(scopeStr, " ")
 	for _, us := range userScopes {
 		// 用户admin: 超级管理员

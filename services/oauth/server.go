@@ -11,10 +11,6 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/generates"
-	"github.com/go-oauth2/oauth2/v4/store"
 	"github.com/mozyy/empty-news/services/user"
 
 	"github.com/go-oauth2/oauth2/v4/errors"
@@ -29,8 +25,6 @@ var (
 	portvar int  = 9096
 )
 
-var TokenStore oauth2.TokenStore
-
 func New() {
 	flag.Parse()
 	if dumpvar {
@@ -41,20 +35,16 @@ func New() {
 
 	// use mysql token store
 	// manager.MapTokenStorage(NewStoreToken())
-	tokenStore, err := store.NewMemoryTokenStore()
-	if err != nil {
-		panic(err)
-	}
-	TokenStore = tokenStore
-	manager.MapTokenStorage(tokenStore)
+
+	manager.MapTokenStorage(TokenStore)
 
 	// generate jwt access token
-	manager.MapAccessGenerate(generates.NewJWTAccessGenerate("", []byte("00000000"), jwt.SigningMethodHS512))
+	manager.MapAccessGenerate(NewAccessGenerate())
 	// manager.MapAccessGenerate(generates.NewAccessGenerate())
 
 	manager.MapClientStorage(NewStoreClient())
 
-	srv := server.NewServer(server.NewConfig(), manager)
+	srv := server.NewDefaultServer(manager)
 
 	userStore := user.NewUserStore()
 
@@ -85,7 +75,7 @@ func New() {
 
 		log.Println("resave oauth/authorize")
 
-		err = srv.HandleAuthorizeRequest(w, r)
+		err := srv.HandleAuthorizeRequest(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 		}
@@ -106,7 +96,7 @@ func New() {
 
 	log.Printf("Server is running at %d port.\n", portvar)
 	go func() {
-		err = http.ListenAndServe(fmt.Sprintf(":%d", portvar), nil)
+		err := http.ListenAndServe(fmt.Sprintf(":%d", portvar), nil)
 		if err != nil {
 			log.Println("oauth server err:", err)
 		}

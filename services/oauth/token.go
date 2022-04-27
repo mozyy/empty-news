@@ -2,7 +2,6 @@ package oauth
 
 import (
 	"context"
-	"encoding/json"
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4"
@@ -16,6 +15,8 @@ import (
 type Oauth2Token struct {
 	*pbuser.OAuthToken
 }
+
+var TokenStore = NewStoreToken()
 
 // o Oauth2Token oauth2.TokenInfo
 
@@ -135,17 +136,17 @@ func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 
 		Code:                info.GetCode(),
 		CodeCreateAt:        &CodeCreateAt,
-		CodeExpiresIn:       int64(info.GetCodeExpiresIn()),
+		CodeExpiresIn:       int64(info.GetCodeExpiresIn().Seconds()),
 		CodeChallenge:       info.GetCodeChallenge(),
 		CodeChallengeMethod: string(info.GetCodeChallengeMethod()),
 
 		Access:          info.GetAccess(),
 		AccessCreateAt:  &AccessCreateAt,
-		AccessExpiresIn: int64(info.GetAccessExpiresIn()),
+		AccessExpiresIn: int64(info.GetAccessExpiresIn().Seconds()),
 
 		Refresh:          info.GetRefresh(),
 		RefreshCreateAt:  &RefreshCreateAt,
-		RefreshExpiresIn: int64(info.GetRefreshExpiresIn()),
+		RefreshExpiresIn: int64(info.GetRefreshExpiresIn().Seconds()),
 	}
 
 	return s.DB.Create(token).Error
@@ -169,22 +170,15 @@ func (s *StoreToken) RemoveByRefresh(ctx context.Context, refresh string) error 
 	return s.remove(ctx, "refresh = ?", refresh)
 }
 
-func (s *StoreToken) toTokenInfo(data string) oauth2.TokenInfo {
-	var tm pbuser.OAuthTokenGORM
-	err := json.Unmarshal([]byte(data), &tm)
-	if err != nil {
-		return nil
-	}
-	token := Oauth2Token{OAuthToken: tm.ToPB(context.Background())}
-	return token
-}
-
 func (s *StoreToken) get(ctx context.Context, query, code string) (oauth2.TokenInfo, error) {
 	token := pbuser.OAuthTokenGORM{}
 	res := s.Where(query, code).First(&token)
 	if res.Error != nil {
 		return Oauth2Token{}, res.Error
 	}
+	token.AccessExpiresIn = token.AccessExpiresIn * int64(time.Second)
+	token.RefreshExpiresIn = token.RefreshExpiresIn * int64(time.Second)
+	token.CodeExpiresIn = token.CodeExpiresIn * int64(time.Second)
 	return Oauth2Token{OAuthToken: token.ToPB(ctx)}, nil
 }
 
