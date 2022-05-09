@@ -40,9 +40,9 @@ func (m *Sources) Create(ctx context.Context, sources *pbmanage.SourcesItem) (*p
 
 func (m *Sources) Update(ctx context.Context, sources *pbmanage.SourcesItem) (*pbmanage.SourcesItem, error) {
 	src := sources.ToORM(ctx)
-	result := m.DB.Create(src)
+	result := m.DB.Model(src).Updates(src)
 	if result.Error != nil {
-		return nil, m.Err(result.Error, "创建资源失败")
+		return nil, m.Err(result.Error, "更新资源失败")
 	}
 	return &pbmanage.SourcesItem{}, nil
 }
@@ -62,21 +62,9 @@ func (m *Sources) List(ctx context.Context, req *pbmanage.SourcesItem) (*pbmanag
 
 func (m *Sources) Delete(ctx context.Context, sources *pbmanage.SourcesItem) (*emptypb.Empty, error) {
 	src := sources.ToORM(ctx)
-	result := m.DB.Create(src)
+	result := m.DB.Delete(src)
 	if result.Error != nil {
 		return nil, m.Err(result.Error, "创建资源失败")
 	}
 	return &emptypb.Empty{}, nil
-}
-
-func generateSourcesTree(list *[]*pbmanage.SourcesItem) {
-	for _, v := range *list {
-		if v.SourcesItemID != 0 {
-			for _, parent := range *list {
-				if parent.ID == v.SourcesItemID {
-					parent.Children = append(parent.Children, v)
-				}
-			}
-		}
-	}
 }
