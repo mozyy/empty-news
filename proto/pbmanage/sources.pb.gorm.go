@@ -10,6 +10,7 @@ import (
 	context "context"
 	_ "github.com/mozyy/protoc-gen-gorm/options"
 	types "github.com/mozyy/protoc-gen-gorm/types"
+	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
@@ -29,8 +30,9 @@ type SourcesItemGORM struct {
 	Children      []*SourcesItemGORM `gorm:"foreignKey:SourcesItemID"`
 	Key           string             `gorm:"unique"`
 	Type          SourcesItem_Type
-	//路由
-	Index bool // 是否首页
+	// 路由
+	// 是否首页
+	Index bool
 	Path  string
 	Name  string
 	Menu  bool

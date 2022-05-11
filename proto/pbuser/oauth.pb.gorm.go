@@ -129,7 +129,6 @@ func (m *OAuthToken) ToORM(ctx context.Context) *OAuthTokenGORM {
 
 type OAuthClientGORM struct {
 	ID        uint32 `gorm:"primaryKey"`
-	ClientID  string
 	Secret    string
 	Domain    string
 	UserID    string
@@ -147,7 +146,6 @@ func (OAuthClientGORM) TableName() string {
 func (m *OAuthClientGORM) ToPB(ctx context.Context) *OAuthClient {
 	to := OAuthClient{}
 	to.ID = m.ID
-	to.ClientID = m.ClientID
 	to.Secret = m.Secret
 	to.Domain = m.Domain
 	to.UserID = m.UserID
@@ -165,7 +163,6 @@ func (m *OAuthClientGORM) ToPB(ctx context.Context) *OAuthClient {
 func (m *OAuthClient) ToORM(ctx context.Context) *OAuthClientGORM {
 	to := OAuthClientGORM{}
 	to.ID = m.GetID()
-	to.ClientID = m.GetClientID()
 	to.Secret = m.GetSecret()
 	to.Domain = m.GetDomain()
 	to.UserID = m.GetUserID()

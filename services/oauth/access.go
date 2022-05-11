@@ -8,7 +8,6 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/go-oauth2/oauth2/v4"
-	"github.com/go-oauth2/oauth2/v4/generates"
 	"github.com/google/uuid"
 )
 
@@ -26,7 +25,6 @@ type JWTClaims struct {
 func NewAccessGenerate() oauth2.AccessGenerate {
 	g := &JWTAccessGenerate{jwt.New(jwt.SigningMethodHS512)}
 
-	generates.NewJWTAccessGenerate(kid, key, jwt.SigningMethodHS512)
 	return g
 }
 

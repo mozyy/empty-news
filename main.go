@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/mozyy/empty-news/proto/pbmanage"
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
@@ -20,6 +22,7 @@ import (
 	"github.com/mozyy/empty-news/services/user"
 	uerrors "github.com/mozyy/empty-news/utils/errors"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -27,7 +30,8 @@ var port = flag.Int("port", 50051, "the port to serve on")
 
 func main() {
 	// Create service
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
+	endpoint := fmt.Sprintf(":%d", *port)
+	lis, err := net.Listen("tcp", endpoint)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -45,6 +49,18 @@ func main() {
 	// Register handler
 
 	register(grpcServer)
+	mux := runtime.NewServeMux()
+	optsc := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
+	pbmanage.RegisterSourcesHandlerFromEndpoint(context.Background(), mux, endpoint, optsc)
+
+	go func() {
+		err = http.ListenAndServe(":8088", mux)
+		if err != nil {
+			log.Fatalf("failed to serve: %s", err)
+		} else {
+			log.Printf("ListenAndServe started successfully")
+		}
+	}()
 
 	oauth.New()
 	conf.New()
@@ -57,6 +73,7 @@ func main() {
 	}
 }
 
+// curl -H "content-type: application/json" -d '{}' http://localhost:8080/v1/echo
 // ensureValidToken ensures a valid token exists within a request's metadata. If
 // the token is missing or invalid, the interceptor blocks execution of the
 // handler and returns an error. Otherwise, the interceptor invokes the unary
