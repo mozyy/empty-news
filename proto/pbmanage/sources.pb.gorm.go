@@ -10,7 +10,6 @@ import (
 	context "context"
 	_ "github.com/mozyy/protoc-gen-gorm/options"
 	types "github.com/mozyy/protoc-gen-gorm/types"
-	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	_ "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
