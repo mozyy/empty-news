@@ -51,11 +51,11 @@ func main() {
 	register(grpcServer)
 	mux := runtime.NewServeMux()
 	optsc := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	pbmanage.RegisterSourcesHandlerFromEndpoint(context.Background(), mux, "localhost"+endpoint, optsc)
-	pbnews.RegisterNewsHandlerFromEndpoint(context.Background(), mux, "localhost"+endpoint, optsc)
+	pbmanage.RegisterSourcesHandlerFromEndpoint(context.Background(), mux, "192.168.120.100"+endpoint, optsc)
+	pbnews.RegisterNewsHandlerFromEndpoint(context.Background(), mux, "192.168.120.100"+endpoint, optsc)
 
 	go func() {
-		err = http.ListenAndServe(":8088", mux)
+		err = http.ListenAndServe(":50061", mux)
 		if err != nil {
 			log.Fatalf("failed to serve: %s", err)
 		} else {
