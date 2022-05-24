@@ -7,11 +7,9 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"strings"
 	"time"
 
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/mozyy/empty-news/proto/pbmanage"
 	"github.com/mozyy/empty-news/proto/pbnews"
 	"github.com/mozyy/empty-news/proto/pbuser"
@@ -22,7 +20,6 @@ import (
 	"github.com/mozyy/empty-news/services/user"
 	uerrors "github.com/mozyy/empty-news/utils/errors"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -49,19 +46,6 @@ func main() {
 	// Register handler
 
 	register(grpcServer)
-	mux := runtime.NewServeMux()
-	optsc := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
-	pbmanage.RegisterSourcesHandlerFromEndpoint(context.Background(), mux, "192.168.120.100"+endpoint, optsc)
-	pbnews.RegisterNewsHandlerFromEndpoint(context.Background(), mux, "192.168.120.100"+endpoint, optsc)
-
-	go func() {
-		err = http.ListenAndServe(":50061", mux)
-		if err != nil {
-			log.Fatalf("failed to serve: %s", err)
-		} else {
-			log.Printf("ListenAndServe started successfully")
-		}
-	}()
 
 	oauth.New()
 	conf.New()
@@ -145,5 +129,5 @@ func register(grpcServer *grpc.Server) {
 	pbnews.RegisterNewsServer(grpcServer, news.New())
 	// pbuser.RegisterUserServer(grpcServer, user.New())
 	pbuser.RegisterUserServer(grpcServer, user.New())
-	pbmanage.RegisterSourcesServer(grpcServer, manage.New())
+	pbmanage.RegisterResourceServer(grpcServer, manage.New())
 }
