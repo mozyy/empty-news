@@ -1,7 +1,7 @@
 package conf
 
 import (
-	"github.com/mozyy/empty-news/proto/pbmodel"
+	confv1 "github.com/mozyy/empty-news/proto/model/conf/v1"
 	"github.com/mozyy/empty-news/utils/db"
 	"gorm.io/gorm"
 )
@@ -12,8 +12,8 @@ type conf struct {
 
 func New() *conf {
 	dbGorm := db.NewGorm("e_user")
-	if !dbGorm.Migrator().HasTable(&pbmodel.ConfGORM{}) {
-		if err := dbGorm.Migrator().CreateTable(&pbmodel.ConfGORM{}); err != nil {
+	if !dbGorm.Migrator().HasTable(&confv1.ConfGORM{}) {
+		if err := dbGorm.Migrator().CreateTable(&confv1.ConfGORM{}); err != nil {
 			panic(err)
 		}
 	}

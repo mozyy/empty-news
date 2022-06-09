@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mozyy/empty-news/proto/pbmanage"
-	"github.com/mozyy/empty-news/proto/pbnews"
-	"github.com/mozyy/empty-news/proto/pbuser"
+	newsv1 "github.com/mozyy/empty-news/proto/news/news/v1"
+	resourcev1 "github.com/mozyy/empty-news/proto/system/resource/v1"
+	loginv1 "github.com/mozyy/empty-news/proto/user/login/v1"
 	"github.com/mozyy/empty-news/services/conf"
 	"github.com/mozyy/empty-news/services/manage"
 	"github.com/mozyy/empty-news/services/news"
@@ -126,8 +126,8 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 
 func register(grpcServer *grpc.Server) {
 	// Register handler
-	pbnews.RegisterNewsServer(grpcServer, news.New())
+	newsv1.RegisterNewsServiceServer(grpcServer, news.New())
 	// pbuser.RegisterUserServer(grpcServer, user.New())
-	pbuser.RegisterUserServer(grpcServer, user.New())
-	pbmanage.RegisterResourceServer(grpcServer, manage.New())
+	loginv1.RegisterUserServiceServer(grpcServer, user.New())
+	resourcev1.RegisterResourceServiceServer(grpcServer, manage.NewResource())
 }

@@ -6,30 +6,30 @@ import (
 	"strings"
 
 	"github.com/gocolly/colly"
-	"github.com/mozyy/empty-news/proto/pbnews"
+	newsv1 "github.com/mozyy/empty-news/proto/news/news/v1"
 )
 
 // News is
-func News() (items []*pbnews.NewsItem, err error) {
+func News() (items []*newsv1.News, err error) {
 	colletcor := colly.NewCollector(
 	// colly.AllowedDomains("cnbeta.com"),
 	)
 	colletcor.OnHTML("body", func(body *colly.HTMLElement) {
-		list := make([]*pbnews.NewsItem, 0)
+		list := make([]*newsv1.News, 0)
 		body.ForEach(".titleAnc", func(_ int, section *colly.HTMLElement) {
-			typeStr := section.Attr("id")
+			typeStr, _ := strconv.Atoi(section.Attr("id"))
 			section.ForEach("li", func(_ int, li *colly.HTMLElement) {
 				if strings.HasPrefix(li.ChildAttr(".txt_area a", "href"), "/") {
 					view, _ := strconv.Atoi(li.ChildText(".ico_view"))
 					comment, _ := strconv.Atoi(li.ChildText(".ico_comment"))
-					list = append(list, &pbnews.NewsItem{
+					list = append(list, &newsv1.News{
 						Link:    li.ChildAttr(".txt_area a", "href")[6:13], // /view/1217435.htm => 1217435
 						Image:   li.ChildAttr("img", "src"),
 						Title:   li.ChildText(".txt_detail"),
 						Time:    li.ChildText(".ico_time"),
 						View:    int32(view),
 						Comment: int32(comment),
-						Type:    typeStr,
+						Type:    newsv1.TYPE(typeStr),
 					})
 				}
 			})

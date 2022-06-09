@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/go-oauth2/oauth2/v4"
-	"github.com/mozyy/empty-news/proto/pbuser"
+	oauthv1 "github.com/mozyy/empty-news/proto/user/oauth/v1"
 	"github.com/mozyy/empty-news/utils/db"
 	"google.golang.org/protobuf/types/known/timestamppb"
 	"gorm.io/gorm"
@@ -13,7 +13,7 @@ import (
 
 // Oauth2Token data item
 type Oauth2Token struct {
-	*pbuser.OAuthToken
+	*oauthv1.OAuthToken
 }
 
 var TokenStore = NewStoreToken()
@@ -112,7 +112,7 @@ func (o Oauth2Token) New() oauth2.TokenInfo {
 func NewStoreToken() *StoreToken {
 
 	dbGorm := db.NewGorm("e_user")
-	dbGorm.AutoMigrate(&pbuser.OAuthTokenGORM{})
+	dbGorm.AutoMigrate(&oauthv1.OAuthTokenGORM{})
 
 	return &StoreToken{dbGorm}
 }
@@ -128,7 +128,7 @@ func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	AccessCreateAt := info.GetAccessCreateAt()
 	RefreshCreateAt := info.GetRefreshCreateAt()
 
-	token := &pbuser.OAuthTokenGORM{
+	token := &oauthv1.OAuthTokenGORM{
 		ClientID:    info.GetClientID(),
 		UserID:      info.GetUserID(),
 		RedirectURI: info.GetRedirectURI(),
@@ -152,7 +152,7 @@ func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	return s.DB.Create(token).Error
 }
 func (s *StoreToken) remove(ctx context.Context, query, value string) error {
-	return s.Where(query, value).Delete(&pbuser.OAuthTokenGORM{}).Error
+	return s.Where(query, value).Delete(&oauthv1.OAuthTokenGORM{}).Error
 }
 
 // RemoveByCode delete the authorization code
@@ -171,7 +171,7 @@ func (s *StoreToken) RemoveByRefresh(ctx context.Context, refresh string) error 
 }
 
 func (s *StoreToken) get(ctx context.Context, query, code string) (oauth2.TokenInfo, error) {
-	token := pbuser.OAuthTokenGORM{}
+	token := oauthv1.OAuthTokenGORM{}
 	res := s.Where(query, code).First(&token)
 	if res.Error != nil {
 		return Oauth2Token{}, res.Error

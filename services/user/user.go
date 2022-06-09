@@ -6,32 +6,32 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/mozyy/empty-news/proto/pbuser"
+	loginv1 "github.com/mozyy/empty-news/proto/user/login/v1"
+	oauthv1 "github.com/mozyy/empty-news/proto/user/oauth/v1"
 	"github.com/mozyy/empty-news/utils/errors"
 	"golang.org/x/oauth2"
-	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type User struct {
 	user *UserStore
-	pbuser.UnimplementedUserServer
+	loginv1.UnimplementedUserServiceServer
 }
 
-func New() *User {
+func New() loginv1.UserServiceServer {
 	return &User{user: NewUserStore()}
 }
 
-func (a *User) Register(ctx context.Context, req *pbuser.RegisterRequest) (*pbuser.OAuthToken, error) {
+func (a *User) Register(ctx context.Context, req *loginv1.RegisterRequest) (*loginv1.RegisterResponse, error) {
 	_, err := a.user.Add(req.GetMobile(), req.GetPassword())
 	if err != nil {
-		return &pbuser.OAuthToken{}, err
+		return &loginv1.RegisterResponse{}, err
 	}
-	return &pbuser.OAuthToken{}, err
+	return &loginv1.RegisterResponse{}, err
 }
 
-func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbuser.OAuthToken, error) {
+func (a *User) Login(ctx context.Context, req *loginv1.LoginRequest) (*loginv1.LoginResponse, error) {
 	if req.GetMobile() == "" || req.GetPassword() == "" {
-		return &pbuser.OAuthToken{}, errors.ErrInvalidArgument
+		return &loginv1.LoginResponse{}, errors.ErrInvalidArgument
 	}
 	// httpClient := &http.Client{Timeout: 2 * time.Second}
 	// ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
@@ -53,11 +53,12 @@ func (a *User) Login(ctx context.Context, req *pbuser.LoginRequest) (*pbuser.OAu
 	}
 	log.Println("recive Login: ", time.Now())
 
-	return &pbuser.OAuthToken{Access: token.AccessToken,
-		TokenType: token.TokenType, Refresh: token.RefreshToken,
-		AccessExpiresIn: int64(time.Until(token.Expiry).Seconds())}, nil
+	return &loginv1.LoginResponse{
+		OAuthToken: &oauthv1.OAuthToken{Access: token.AccessToken,
+			TokenType: token.TokenType, Refresh: token.RefreshToken,
+			AccessExpiresIn: int64(time.Until(token.Expiry).Seconds())}}, nil
 }
 
-func (a *User) Info(_ context.Context, _ *emptypb.Empty) (*pbuser.InfoResponse, error) {
+func (a *User) Info(_ context.Context, _ *loginv1.InfoRequest) (*loginv1.InfoResponse, error) {
 	panic("not implemented") // TODO: Implement
 }

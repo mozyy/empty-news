@@ -8,8 +8,8 @@ import (
 	"net/http"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	"github.com/mozyy/empty-news/proto/pbmanage"
-	"github.com/mozyy/empty-news/proto/pbnews"
+	newsv1 "github.com/mozyy/empty-news/proto/news/news/v1"
+	resourcev1 "github.com/mozyy/empty-news/proto/system/resource/v1"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -24,8 +24,8 @@ func main() {
 	mux := runtime.NewServeMux()
 	optsc := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 	handlers := []func(context.Context, *runtime.ServeMux, string, []grpc.DialOption) error{
-		pbmanage.RegisterResourceHandlerFromEndpoint,
-		pbnews.RegisterNewsHandlerFromEndpoint,
+		resourcev1.RegisterResourceServiceHandlerFromEndpoint,
+		newsv1.RegisterNewsServiceHandlerFromEndpoint,
 	}
 	for _, f := range handlers {
 		if err := f(ctx, mux, *endpoint, optsc); err != nil {

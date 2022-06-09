@@ -6,45 +6,44 @@ import (
 	"sync"
 	"time"
 
-	"google.golang.org/protobuf/types/known/emptypb"
 	"gorm.io/gorm"
 
 	"github.com/mozyy/empty-news/crawler"
-	"github.com/mozyy/empty-news/proto/pbnews"
+	newsv1 "github.com/mozyy/empty-news/proto/news/news/v1"
 	"github.com/mozyy/empty-news/utils/db"
 )
 
 type news struct {
 	sync.Mutex
-	newsList *pbnews.ListResponse
+	newsList *newsv1.ListResponse
 	dbGorm   *gorm.DB
-	pbnews.UnimplementedNewsServer
+	newsv1.UnimplementedNewsServiceServer
 }
 
-func New() pbnews.NewsServer {
+func New() newsv1.NewsServiceServer {
 	dbGorm := db.NewGorm("e_user")
 	dbGorm.AutoMigrate(&newsDetail{})
-	dbGorm.AutoMigrate(&pbnews.DetailResponse_DetailContentGORM{})
+	dbGorm.AutoMigrate(&newsv1.DetailResponse_DetailContentGORM{})
 	return &news{dbGorm: dbGorm}
 }
 
-func (e *news) SetNewsList(list *pbnews.ListResponse) {
+func (e *news) SetNewsList(list *newsv1.ListResponse) {
 	e.Lock()
 	e.newsList = list
 	e.Unlock()
 }
 
-func (e *news) GetNewsList() *pbnews.ListResponse {
+func (e *news) GetNewsList() *newsv1.ListResponse {
 	e.Lock()
 	defer e.Unlock()
 	return e.newsList
 }
 
 type newsDetail struct {
-	pbnews.DetailResponseGORM
+	newsv1.DetailResponseGORM
 }
 
-func (e *news) SetNewsDetails(No string, resp *pbnews.DetailResponse, ctx context.Context) {
+func (e *news) SetNewsDetails(No string, resp *newsv1.DetailResponse, ctx context.Context) {
 	v := &newsDetail{DetailResponseGORM: *resp.ToORM(ctx)}
 	v.No = No
 	res := e.dbGorm.Create(v)
@@ -53,7 +52,7 @@ func (e *news) SetNewsDetails(No string, resp *pbnews.DetailResponse, ctx contex
 	}
 }
 
-func (e *news) GetNewsDetails(No string, ctx context.Context) (*pbnews.DetailResponse, error) {
+func (e *news) GetNewsDetails(No string, ctx context.Context) (*newsv1.DetailResponse, error) {
 	d := &newsDetail{}
 	d.No = No
 	err := e.dbGorm.Preload("Content").First(d, d)
@@ -65,12 +64,12 @@ func (e *news) GetNewsDetails(No string, ctx context.Context) (*pbnews.DetailRes
 }
 
 // List is a single request handler called via client.Call or the generated client code
-func (e *news) List(ctx context.Context, req *emptypb.Empty) (*pbnews.ListResponse, error) {
+func (e *news) List(ctx context.Context, req *newsv1.ListRequest) (*newsv1.ListResponse, error) {
 	// 接口有点慢, 缓存五分钟的结果
 	if e.GetNewsList() != nil {
 		return e.GetNewsList(), nil
 	}
-	res := &pbnews.ListResponse{}
+	res := &newsv1.ListResponse{}
 	list, err := crawler.News()
 	res.List = list
 	if err == nil {
@@ -97,7 +96,7 @@ func (e *news) List(ctx context.Context, req *emptypb.Empty) (*pbnews.ListRespon
 // }
 
 // NewsList is a single request handler called via client.Call or the generated client code
-func (e *news) Detail(ctx context.Context, req *pbnews.DetailRequest) (*pbnews.DetailResponse, error) {
+func (e *news) Detail(ctx context.Context, req *newsv1.DetailRequest) (*newsv1.DetailResponse, error) {
 	resDb, err := e.GetNewsDetails(req.GetURL(), ctx)
 	if err == nil {
 		return resDb, nil

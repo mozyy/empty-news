@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/mozyy/empty-news/proto/pbmodel"
+	userv1 "github.com/mozyy/empty-news/proto/model/user/v1"
 	"github.com/mozyy/empty-news/utils"
 	"github.com/mozyy/empty-news/utils/db"
 	"gorm.io/gorm"
@@ -14,7 +14,7 @@ import (
 type UserStore struct {
 	*gorm.DB
 }
-type Oauth2User = pbmodel.UserGORM
+type Oauth2User = userv1.UserGORM
 
 func NewUserStore() *UserStore {
 	dbGorm := db.NewGorm("e_user")
