@@ -11,110 +11,110 @@ import (
 	"gorm.io/gorm"
 )
 
-// Oauth2Token data item
-type Oauth2Token struct {
-	*oauthv1.OAuthToken
+// TokenInfo implement oauth2.TokenInfo
+type TokenInfo struct {
+	*oauthv1.TokenInfo
 }
 
-var TokenStore = NewStoreToken()
-
-// o Oauth2Token oauth2.TokenInfo
-
-func (o Oauth2Token) SetClientID(value string) {
+func (o TokenInfo) SetClientID(value string) {
 	o.ClientID = value
 }
 
-func (o Oauth2Token) SetUserID(value string) {
+func (o TokenInfo) SetUserID(value string) {
 	o.UserID = value
 }
 
-func (o Oauth2Token) SetRedirectURI(value string) {
+func (o TokenInfo) SetRedirectURI(value string) {
 	o.RedirectURI = value
 }
 
-func (o Oauth2Token) SetScope(value string) {
+func (o TokenInfo) SetScope(value string) {
 	o.Scope = value
 }
 
-func (o Oauth2Token) SetCode(value string) {
+func (o TokenInfo) SetCode(value string) {
 	o.Code = value
 }
 
-func (o Oauth2Token) SetCodeCreateAt(value time.Time) {
+func (o TokenInfo) SetCodeCreateAt(value time.Time) {
 	o.AccessCreateAt = timestamppb.New(value)
 }
 
-func (o Oauth2Token) SetCodeExpiresIn(value time.Duration) {
+func (o TokenInfo) SetCodeExpiresIn(value time.Duration) {
 	o.CodeExpiresIn = int64(value)
 }
 
-func (o Oauth2Token) SetCodeChallenge(value string) {
+func (o TokenInfo) SetCodeChallenge(value string) {
 	o.CodeChallenge = value
 }
 
-func (o Oauth2Token) SetCodeChallengeMethod(value oauth2.CodeChallengeMethod) {
-	o.CodeChallengeMethod = string(value)
+func (o TokenInfo) SetCodeChallengeMethod(value oauth2.CodeChallengeMethod) {
+	o.CodeChallengeMethod = oauthv1.CodeChallengeMethod(oauthv1.CodeChallengeMethod_value[string(value)])
 }
 
-func (o Oauth2Token) SetAccess(value string) {
+func (o TokenInfo) SetAccess(value string) {
 	o.Access = value
 }
 
-func (o Oauth2Token) SetAccessCreateAt(value time.Time) {
+func (o TokenInfo) SetAccessCreateAt(value time.Time) {
 	o.AccessCreateAt = timestamppb.New(value)
 }
 
-func (o Oauth2Token) SetAccessExpiresIn(value time.Duration) {
+func (o TokenInfo) SetAccessExpiresIn(value time.Duration) {
 	o.AccessExpiresIn = int64(value)
 }
 
-func (o Oauth2Token) SetRefresh(value string) {
+func (o TokenInfo) SetRefresh(value string) {
 	o.Refresh = value
 }
 
-func (o Oauth2Token) SetRefreshCreateAt(value time.Time) {
+func (o TokenInfo) SetRefreshCreateAt(value time.Time) {
 	o.RefreshCreateAt = timestamppb.New(value)
 }
 
-func (o Oauth2Token) SetRefreshExpiresIn(value time.Duration) {
+func (o TokenInfo) SetRefreshExpiresIn(value time.Duration) {
 	o.RefreshExpiresIn = int64(value)
 }
 
-func (o Oauth2Token) GetAccessCreateAt() time.Time {
+func (o TokenInfo) GetAccessCreateAt() time.Time {
 	return o.AccessCreateAt.AsTime()
 }
-func (o Oauth2Token) GetAccessExpiresIn() time.Duration {
+func (o TokenInfo) GetAccessExpiresIn() time.Duration {
 	return time.Duration(o.AccessExpiresIn)
 }
-func (o Oauth2Token) GetCodeChallengeMethod() oauth2.CodeChallengeMethod {
+func (o TokenInfo) GetCodeChallengeMethod() oauth2.CodeChallengeMethod {
 	return oauth2.CodeChallengeMethod(o.CodeChallengeMethod)
 }
-func (o Oauth2Token) GetCodeCreateAt() time.Time {
+func (o TokenInfo) GetCodeCreateAt() time.Time {
 	return o.CodeCreateAt.AsTime()
 }
-func (o Oauth2Token) GetCodeExpiresIn() time.Duration {
+func (o TokenInfo) GetCodeExpiresIn() time.Duration {
 	return time.Duration(o.CodeExpiresIn)
 }
 
-func (o Oauth2Token) GetRefreshCreateAt() time.Time {
+func (o TokenInfo) GetRefreshCreateAt() time.Time {
 	return o.RefreshCreateAt.AsTime()
 }
-func (o Oauth2Token) GetRefreshExpiresIn() time.Duration {
+func (o TokenInfo) GetRefreshExpiresIn() time.Duration {
 	return time.Duration(o.RefreshExpiresIn)
 }
-func (o Oauth2Token) New() oauth2.TokenInfo {
-	return Oauth2Token{
-		OAuthToken: o.ToORM(context.Background()).ToPB(context.Background()),
+func (o TokenInfo) New() oauth2.TokenInfo {
+	return TokenInfo{
+		TokenInfo: o.ToORM(context.Background()).ToPB(context.Background()),
 	}
 }
 
+var newStoreToken oauth2.TokenStore
+
 // NewStoreToken create mysql store instance,
-func NewStoreToken() *StoreToken {
+func NewStoreToken() oauth2.TokenStore {
+	if newStoreToken == nil {
+		dbGorm := db.NewGorm("e_user")
+		dbGorm.AutoMigrate(&oauthv1.TokenInfoGORM{})
 
-	dbGorm := db.NewGorm("e_user")
-	dbGorm.AutoMigrate(&oauthv1.OAuthTokenGORM{})
-
-	return &StoreToken{dbGorm}
+		newStoreToken = &StoreToken{dbGorm}
+	}
+	return newStoreToken
 }
 
 // StoreToken mysql token store
@@ -128,7 +128,7 @@ func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	AccessCreateAt := info.GetAccessCreateAt()
 	RefreshCreateAt := info.GetRefreshCreateAt()
 
-	token := &oauthv1.OAuthTokenGORM{
+	token := &oauthv1.TokenInfoGORM{
 		ClientID:    info.GetClientID(),
 		UserID:      info.GetUserID(),
 		RedirectURI: info.GetRedirectURI(),
@@ -138,7 +138,7 @@ func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 		CodeCreateAt:        &CodeCreateAt,
 		CodeExpiresIn:       int64(info.GetCodeExpiresIn().Seconds()),
 		CodeChallenge:       info.GetCodeChallenge(),
-		CodeChallengeMethod: string(info.GetCodeChallengeMethod()),
+		CodeChallengeMethod: oauthv1.CodeChallengeMethod(oauthv1.CodeChallengeMethod_value[string(info.GetCodeChallengeMethod())]),
 
 		Access:          info.GetAccess(),
 		AccessCreateAt:  &AccessCreateAt,
@@ -152,7 +152,7 @@ func (s *StoreToken) Create(ctx context.Context, info oauth2.TokenInfo) error {
 	return s.DB.Create(token).Error
 }
 func (s *StoreToken) remove(ctx context.Context, query, value string) error {
-	return s.Where(query, value).Delete(&oauthv1.OAuthTokenGORM{}).Error
+	return s.Where(query, value).Delete(&oauthv1.TokenInfoGORM{}).Error
 }
 
 // RemoveByCode delete the authorization code
@@ -171,15 +171,15 @@ func (s *StoreToken) RemoveByRefresh(ctx context.Context, refresh string) error 
 }
 
 func (s *StoreToken) get(ctx context.Context, query, code string) (oauth2.TokenInfo, error) {
-	token := oauthv1.OAuthTokenGORM{}
+	token := oauthv1.TokenInfoGORM{}
 	res := s.Where(query, code).First(&token)
 	if res.Error != nil {
-		return Oauth2Token{}, res.Error
+		return TokenInfo{}, res.Error
 	}
 	token.AccessExpiresIn = token.AccessExpiresIn * int64(time.Second)
 	token.RefreshExpiresIn = token.RefreshExpiresIn * int64(time.Second)
 	token.CodeExpiresIn = token.CodeExpiresIn * int64(time.Second)
-	return Oauth2Token{OAuthToken: token.ToPB(ctx)}, nil
+	return TokenInfo{TokenInfo: token.ToPB(ctx)}, nil
 }
 
 // GetByCode use the authorization code for token information data

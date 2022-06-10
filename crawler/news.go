@@ -29,7 +29,7 @@ func News() (items []*newsv1.News, err error) {
 						Time:    li.ChildText(".ico_time"),
 						View:    int32(view),
 						Comment: int32(comment),
-						Type:    newsv1.TYPE(typeStr),
+						Type:    newsv1.Type(typeStr),
 					})
 				}
 			})

@@ -24,55 +24,55 @@ const (
 )
 
 // 资源类型
-type Resource_TYPE int32
+type Resource_Type int32
 
 const (
 	// 路由
-	Resource_TYPE_ROUTE_UNSPECIFIED Resource_TYPE = 0
+	Resource_TYPE_ROUTE_UNSPECIFIED Resource_Type = 0
 	// 功能
-	Resource_TYPE_FUNCTION Resource_TYPE = 1
+	Resource_TYPE_FUNCTION Resource_Type = 1
 	// 接品
-	Resource_TYPE_API Resource_TYPE = 2
+	Resource_TYPE_API Resource_Type = 2
 )
 
-// Enum value maps for Resource_TYPE.
+// Enum value maps for Resource_Type.
 var (
-	Resource_TYPE_name = map[int32]string{
+	Resource_Type_name = map[int32]string{
 		0: "TYPE_ROUTE_UNSPECIFIED",
 		1: "TYPE_FUNCTION",
 		2: "TYPE_API",
 	}
-	Resource_TYPE_value = map[string]int32{
+	Resource_Type_value = map[string]int32{
 		"TYPE_ROUTE_UNSPECIFIED": 0,
 		"TYPE_FUNCTION":          1,
 		"TYPE_API":               2,
 	}
 )
 
-func (x Resource_TYPE) Enum() *Resource_TYPE {
-	p := new(Resource_TYPE)
+func (x Resource_Type) Enum() *Resource_Type {
+	p := new(Resource_Type)
 	*p = x
 	return p
 }
 
-func (x Resource_TYPE) String() string {
+func (x Resource_Type) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (Resource_TYPE) Descriptor() protoreflect.EnumDescriptor {
+func (Resource_Type) Descriptor() protoreflect.EnumDescriptor {
 	return file_system_resource_v1_resource_proto_enumTypes[0].Descriptor()
 }
 
-func (Resource_TYPE) Type() protoreflect.EnumType {
+func (Resource_Type) Type() protoreflect.EnumType {
 	return &file_system_resource_v1_resource_proto_enumTypes[0]
 }
 
-func (x Resource_TYPE) Number() protoreflect.EnumNumber {
+func (x Resource_Type) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use Resource_TYPE.Descriptor instead.
-func (Resource_TYPE) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use Resource_Type.Descriptor instead.
+func (Resource_Type) EnumDescriptor() ([]byte, []int) {
 	return file_system_resource_v1_resource_proto_rawDescGZIP(), []int{0, 0}
 }
 
@@ -89,7 +89,7 @@ type Resource struct {
 	ResourceItemID uint32                 `protobuf:"varint,5,opt,name=resource_itemID,json=resourceItemID,proto3" json:"resource_itemID,omitempty"`
 	Children       []*Resource            `protobuf:"bytes,6,rep,name=children,proto3" json:"children,omitempty"`
 	Key            string                 `protobuf:"bytes,7,opt,name=key,proto3" json:"key,omitempty"`
-	Type           Resource_TYPE          `protobuf:"varint,8,opt,name=type,proto3,enum=system.resource.v1.Resource_TYPE" json:"type,omitempty"`
+	Type           Resource_Type          `protobuf:"varint,8,opt,name=type,proto3,enum=system.resource.v1.Resource_Type" json:"type,omitempty"`
 	// 路由
 	// 是否首页
 	Index bool   `protobuf:"varint,9,opt,name=index,proto3" json:"index,omitempty"`
@@ -182,7 +182,7 @@ func (x *Resource) GetKey() string {
 	return ""
 }
 
-func (x *Resource) GetType() Resource_TYPE {
+func (x *Resource) GetType() Resource_Type {
 	if x != nil {
 		return x.Type
 	}
@@ -645,7 +645,7 @@ var file_system_resource_v1_resource_proto_rawDesc = []byte{
 	0x03, 0x6b, 0x65, 0x79, 0x12, 0x35, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x08, 0x20, 0x01,
 	0x28, 0x0e, 0x32, 0x21, 0x2e, 0x73, 0x79, 0x73, 0x74, 0x65, 0x6d, 0x2e, 0x72, 0x65, 0x73, 0x6f,
 	0x75, 0x72, 0x63, 0x65, 0x2e, 0x76, 0x31, 0x2e, 0x52, 0x65, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x2e, 0x54, 0x59, 0x50, 0x45, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69,
+	0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x14, 0x0a, 0x05, 0x69,
 	0x6e, 0x64, 0x65, 0x78, 0x18, 0x09, 0x20, 0x01, 0x28, 0x08, 0x52, 0x05, 0x69, 0x6e, 0x64, 0x65,
 	0x78, 0x12, 0x12, 0x0a, 0x04, 0x70, 0x61, 0x74, 0x68, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x04, 0x70, 0x61, 0x74, 0x68, 0x12, 0x12, 0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x0b, 0x20,
@@ -653,7 +653,7 @@ var file_system_resource_v1_resource_proto_rawDesc = []byte{
 	0x75, 0x18, 0x0c, 0x20, 0x01, 0x28, 0x08, 0x52, 0x04, 0x6d, 0x65, 0x6e, 0x75, 0x12, 0x12, 0x0a,
 	0x04, 0x69, 0x63, 0x6f, 0x6e, 0x18, 0x0d, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x69, 0x63, 0x6f,
 	0x6e, 0x12, 0x12, 0x0a, 0x04, 0x64, 0x65, 0x73, 0x63, 0x18, 0x0e, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x04, 0x64, 0x65, 0x73, 0x63, 0x22, 0x43, 0x0a, 0x04, 0x54, 0x59, 0x50, 0x45, 0x12, 0x1a, 0x0a,
+	0x04, 0x64, 0x65, 0x73, 0x63, 0x22, 0x43, 0x0a, 0x04, 0x54, 0x79, 0x70, 0x65, 0x12, 0x1a, 0x0a,
 	0x16, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x52, 0x4f, 0x55, 0x54, 0x45, 0x5f, 0x55, 0x4e, 0x53, 0x50,
 	0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x54, 0x59, 0x50,
 	0x45, 0x5f, 0x46, 0x55, 0x4e, 0x43, 0x54, 0x49, 0x4f, 0x4e, 0x10, 0x01, 0x12, 0x0c, 0x0a, 0x08,
@@ -749,7 +749,7 @@ func file_system_resource_v1_resource_proto_rawDescGZIP() []byte {
 var file_system_resource_v1_resource_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_system_resource_v1_resource_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_system_resource_v1_resource_proto_goTypes = []interface{}{
-	(Resource_TYPE)(0),            // 0: system.resource.v1.Resource.TYPE
+	(Resource_Type)(0),            // 0: system.resource.v1.Resource.Type
 	(*Resource)(nil),              // 1: system.resource.v1.Resource
 	(*CreateRequest)(nil),         // 2: system.resource.v1.CreateRequest
 	(*CreateResponse)(nil),        // 3: system.resource.v1.CreateResponse
@@ -767,7 +767,7 @@ var file_system_resource_v1_resource_proto_depIdxs = []int32{
 	10, // 1: system.resource.v1.Resource.updated_at:type_name -> google.protobuf.Timestamp
 	11, // 2: system.resource.v1.Resource.deleted_at:type_name -> types.DeletedAt
 	1,  // 3: system.resource.v1.Resource.children:type_name -> system.resource.v1.Resource
-	0,  // 4: system.resource.v1.Resource.type:type_name -> system.resource.v1.Resource.TYPE
+	0,  // 4: system.resource.v1.Resource.type:type_name -> system.resource.v1.Resource.Type
 	1,  // 5: system.resource.v1.CreateRequest.resource:type_name -> system.resource.v1.Resource
 	1,  // 6: system.resource.v1.CreateResponse.resource:type_name -> system.resource.v1.Resource
 	1,  // 7: system.resource.v1.UpdateRequest.resource:type_name -> system.resource.v1.Resource

@@ -20,24 +20,24 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type STATUS int32
+type Status int32
 
 const (
-	STATUS_STATUS_SUCCESS_UNSPECIFIED STATUS = 0
-	STATUS_STATUS_INFO                STATUS = 1
-	STATUS_STATUS_WARNING             STATUS = 2
-	STATUS_STATUS_ERROR               STATUS = 3
+	Status_STATUS_SUCCESS_UNSPECIFIED Status = 0
+	Status_STATUS_INFO                Status = 1
+	Status_STATUS_WARNING             Status = 2
+	Status_STATUS_ERROR               Status = 3
 )
 
-// Enum value maps for STATUS.
+// Enum value maps for Status.
 var (
-	STATUS_name = map[int32]string{
+	Status_name = map[int32]string{
 		0: "STATUS_SUCCESS_UNSPECIFIED",
 		1: "STATUS_INFO",
 		2: "STATUS_WARNING",
 		3: "STATUS_ERROR",
 	}
-	STATUS_value = map[string]int32{
+	Status_value = map[string]int32{
 		"STATUS_SUCCESS_UNSPECIFIED": 0,
 		"STATUS_INFO":                1,
 		"STATUS_WARNING":             2,
@@ -45,30 +45,30 @@ var (
 	}
 )
 
-func (x STATUS) Enum() *STATUS {
-	p := new(STATUS)
+func (x Status) Enum() *Status {
+	p := new(Status)
 	*p = x
 	return p
 }
 
-func (x STATUS) String() string {
+func (x Status) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (STATUS) Descriptor() protoreflect.EnumDescriptor {
+func (Status) Descriptor() protoreflect.EnumDescriptor {
 	return file_model_message_v1_message_proto_enumTypes[0].Descriptor()
 }
 
-func (STATUS) Type() protoreflect.EnumType {
+func (Status) Type() protoreflect.EnumType {
 	return &file_model_message_v1_message_proto_enumTypes[0]
 }
 
-func (x STATUS) Number() protoreflect.EnumNumber {
+func (x Status) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use STATUS.Descriptor instead.
-func (STATUS) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use Status.Descriptor instead.
+func (Status) EnumDescriptor() ([]byte, []int) {
 	return file_model_message_v1_message_proto_rawDescGZIP(), []int{0}
 }
 
@@ -77,7 +77,7 @@ type Message struct {
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	State   STATUS `protobuf:"varint,1,opt,name=state,proto3,enum=model.message.v1.STATUS" json:"state,omitempty"`
+	State   Status `protobuf:"varint,1,opt,name=state,proto3,enum=model.message.v1.Status" json:"state,omitempty"`
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
 }
 
@@ -113,11 +113,11 @@ func (*Message) Descriptor() ([]byte, []int) {
 	return file_model_message_v1_message_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *Message) GetState() STATUS {
+func (x *Message) GetState() Status {
 	if x != nil {
 		return x.State
 	}
-	return STATUS_STATUS_SUCCESS_UNSPECIFIED
+	return Status_STATUS_SUCCESS_UNSPECIFIED
 }
 
 func (x *Message) GetMessage() string {
@@ -136,10 +136,10 @@ var file_model_message_v1_message_proto_rawDesc = []byte{
 	0x76, 0x31, 0x22, 0x53, 0x0a, 0x07, 0x4d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x2e, 0x0a,
 	0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0e, 0x32, 0x18, 0x2e, 0x6d,
 	0x6f, 0x64, 0x65, 0x6c, 0x2e, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2e, 0x76, 0x31, 0x2e,
-	0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x52, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x12, 0x18, 0x0a,
+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x52, 0x05, 0x73, 0x74, 0x61, 0x74, 0x65, 0x12, 0x18, 0x0a,
 	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07,
-	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2a, 0x5f, 0x0a, 0x06, 0x53, 0x54, 0x41, 0x54, 0x55,
-	0x53, 0x12, 0x1e, 0x0a, 0x1a, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x53, 0x55, 0x43, 0x43,
+	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x2a, 0x5f, 0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x12, 0x1e, 0x0a, 0x1a, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x53, 0x55, 0x43, 0x43,
 	0x45, 0x53, 0x53, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10,
 	0x00, 0x12, 0x0f, 0x0a, 0x0b, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x49, 0x4e, 0x46, 0x4f,
 	0x10, 0x01, 0x12, 0x12, 0x0a, 0x0e, 0x53, 0x54, 0x41, 0x54, 0x55, 0x53, 0x5f, 0x57, 0x41, 0x52,
@@ -175,11 +175,11 @@ func file_model_message_v1_message_proto_rawDescGZIP() []byte {
 var file_model_message_v1_message_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_model_message_v1_message_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_model_message_v1_message_proto_goTypes = []interface{}{
-	(STATUS)(0),     // 0: model.message.v1.STATUS
+	(Status)(0),     // 0: model.message.v1.Status
 	(*Message)(nil), // 1: model.message.v1.Message
 }
 var file_model_message_v1_message_proto_depIdxs = []int32{
-	0, // 0: model.message.v1.Message.state:type_name -> model.message.v1.STATUS
+	0, // 0: model.message.v1.Message.state:type_name -> model.message.v1.Status
 	1, // [1:1] is the sub-list for method output_type
 	1, // [1:1] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name

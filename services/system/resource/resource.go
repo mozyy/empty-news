@@ -1,4 +1,4 @@
-package manage
+package resource
 
 import (
 	"context"
@@ -16,7 +16,7 @@ type Resource struct {
 	resourcev1.UnsafeResourceServiceServer
 }
 
-func NewResource() resourcev1.ResourceServiceServer {
+func New() resourcev1.ResourceServiceServer {
 	dbGorm := db.NewGorm("e_user")
 	Err := errors.New("系统管理")
 	err := dbGorm.AutoMigrate(resourcev1.ResourceGORM{})

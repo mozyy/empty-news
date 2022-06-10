@@ -17,7 +17,7 @@
  */
 
 // Package main implements a client for Greeter service.
-package main
+package client
 
 import (
 	"context"
@@ -29,14 +29,18 @@ import (
 )
 
 const (
-	// address = "localhost:50051"
-	address = "https://yyue.vip/i/api/"
+	address = "localhost:50051"
+	// address = "https://yyue.vip/i/api/"
 )
+
+func Conn() (*grpc.ClientConn, error) {
+	return grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+}
 
 func main() {
 	// Set up a connection to the server.
 	log.Printf("start111  \n")
-	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock(), grpc.WithTimeout(5*time.Second))
+	conn, err := Conn()
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}

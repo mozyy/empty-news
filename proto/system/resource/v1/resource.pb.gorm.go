@@ -28,7 +28,7 @@ type ResourceGORM struct {
 	ResourceItemID uint32
 	Children       []*ResourceGORM `gorm:"foreignKey:ResourceItemID"`
 	Key            string          `gorm:"unique"`
-	Type           Resource_TYPE
+	Type           Resource_Type
 	// 路由
 	// 是否首页
 	Index bool

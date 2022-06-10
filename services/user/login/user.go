@@ -1,15 +1,14 @@
-package user
+package login
 
 import (
 	"context"
 	"log"
-	"time"
 
 	_ "github.com/go-sql-driver/mysql"
 	loginv1 "github.com/mozyy/empty-news/proto/user/login/v1"
 	oauthv1 "github.com/mozyy/empty-news/proto/user/oauth/v1"
+	"github.com/mozyy/empty-news/services/client"
 	"github.com/mozyy/empty-news/utils/errors"
-	"golang.org/x/oauth2"
 )
 
 type User struct {
@@ -30,33 +29,36 @@ func (a *User) Register(ctx context.Context, req *loginv1.RegisterRequest) (*log
 }
 
 func (a *User) Login(ctx context.Context, req *loginv1.LoginRequest) (*loginv1.LoginResponse, error) {
-	if req.GetMobile() == "" || req.GetPassword() == "" {
+	if req.GetMobile() == "" || req.GetPassword() == "" || req.GetSmsCode() == "" {
 		return &loginv1.LoginResponse{}, errors.ErrInvalidArgument
 	}
-	// httpClient := &http.Client{Timeout: 2 * time.Second}
-	// ctx = context.WithValue(ctx, oauth2.HTTPClient, httpClient)
-	authServerURL := "http://localhost:9096"
-	config := oauth2.Config{
-		ClientID:     "1",
-		ClientSecret: "286786c5-9b22-4afe-ad64-0716132b915b",
-		Scopes:       []string{"admin"},
-		RedirectURL:  "http://0.0.0.0:9096/oauth2",
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  authServerURL + "/oauth/authorize",
-			TokenURL: authServerURL + "/oauth/token",
-		},
-	}
-	log.Println("recive Login: ", time.Now())
-	token, err := config.PasswordCredentialsToken(ctx, req.GetMobile(), req.GetPassword())
+	conn, err := client.Conn()
 	if err != nil {
 		return nil, err
 	}
-	log.Println("recive Login: ", time.Now())
+	defer conn.Close()
+	client := oauthv1.NewOAuthServiceClient(conn)
+	reqToekn := &oauthv1.TokenRequest{
+		GrantType: oauthv1.GrantType_password,
+		Username:  req.GetMobile(),
+		Password:  req.GetPassword(),
+		TokenGenerateRequest: &oauthv1.TokenGenerateRequest{
+			ClientID:     "1",
+			ClientSecret: "286786c5-9b22-4afe-ad64-0716132b915b",
+			Scope:        "admin",
+		},
+	}
+	res, err := client.Token(ctx, reqToekn)
+	if err != nil {
+		return nil, err
+	}
+	tokenInfo := res.GetTokenInfo()
+	log.Println(tokenInfo)
 
 	return &loginv1.LoginResponse{
-		OAuthToken: &oauthv1.OAuthToken{Access: token.AccessToken,
-			TokenType: token.TokenType, Refresh: token.RefreshToken,
-			AccessExpiresIn: int64(time.Until(token.Expiry).Seconds())}}, nil
+		OAuthToken: &oauthv1.TokenInfo{Access: tokenInfo.GetAccess(),
+			TokenType: tokenInfo.GetTokenType(), Refresh: tokenInfo.GetRefresh(),
+			AccessExpiresIn: tokenInfo.GetAccessExpiresIn()}}, nil
 }
 
 func (a *User) Info(_ context.Context, _ *loginv1.InfoRequest) (*loginv1.InfoResponse, error) {

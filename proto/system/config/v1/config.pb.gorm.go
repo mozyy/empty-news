@@ -25,11 +25,11 @@ const (
 
 type ConfigGORM struct {
 	ID         uint32 `gorm:"primaryKey"`
-	Type       string
+	Type       Type
 	Value      string
 	Content    string
 	Desc       string
-	OAuthToken *v1.OAuthTokenGORM
+	OAuthToken *v1.TokenInfoGORM
 	CreatedAt  *time.Time
 	UpdatedAt  *time.Time
 	DeletedAt  *types.DeletedAt `gorm:"index"`

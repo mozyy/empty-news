@@ -13,11 +13,12 @@ import (
 	newsv1 "github.com/mozyy/empty-news/proto/news/news/v1"
 	resourcev1 "github.com/mozyy/empty-news/proto/system/resource/v1"
 	loginv1 "github.com/mozyy/empty-news/proto/user/login/v1"
+	oauthv1 "github.com/mozyy/empty-news/proto/user/oauth/v1"
 	"github.com/mozyy/empty-news/services/conf"
-	"github.com/mozyy/empty-news/services/manage"
 	"github.com/mozyy/empty-news/services/news"
-	"github.com/mozyy/empty-news/services/oauth"
-	"github.com/mozyy/empty-news/services/user"
+	"github.com/mozyy/empty-news/services/system/resource"
+	"github.com/mozyy/empty-news/services/user/login"
+	"github.com/mozyy/empty-news/services/user/oauth"
 	uerrors "github.com/mozyy/empty-news/utils/errors"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -47,7 +48,7 @@ func main() {
 
 	register(grpcServer)
 
-	oauth.New()
+	// oauth.NewServerHttp(9096)
 	conf.New()
 
 	log.Printf("starting")
@@ -128,6 +129,7 @@ func register(grpcServer *grpc.Server) {
 	// Register handler
 	newsv1.RegisterNewsServiceServer(grpcServer, news.New())
 	// pbuser.RegisterUserServer(grpcServer, user.New())
-	loginv1.RegisterUserServiceServer(grpcServer, user.New())
-	resourcev1.RegisterResourceServiceServer(grpcServer, manage.NewResource())
+	loginv1.RegisterUserServiceServer(grpcServer, login.New())
+	resourcev1.RegisterResourceServiceServer(grpcServer, resource.New())
+	oauthv1.RegisterOAuthServiceServer(grpcServer, oauth.NewServerGrpc())
 }

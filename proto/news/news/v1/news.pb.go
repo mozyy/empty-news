@@ -23,24 +23,24 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type TYPE int32
+type Type int32
 
 const (
-	TYPE_TYPE_INDUSTRY_UNSPECIFIED TYPE = 0
-	TYPE_TYPE_SCIENCE              TYPE = 1
-	TYPE_TYPE_FILM                 TYPE = 2
-	TYPE_TYPE_GAME                 TYPE = 3
+	Type_TYPE_INDUSTRY_UNSPECIFIED Type = 0
+	Type_TYPE_SCIENCE              Type = 1
+	Type_TYPE_FILM                 Type = 2
+	Type_TYPE_GAME                 Type = 3
 )
 
-// Enum value maps for TYPE.
+// Enum value maps for Type.
 var (
-	TYPE_name = map[int32]string{
+	Type_name = map[int32]string{
 		0: "TYPE_INDUSTRY_UNSPECIFIED",
 		1: "TYPE_SCIENCE",
 		2: "TYPE_FILM",
 		3: "TYPE_GAME",
 	}
-	TYPE_value = map[string]int32{
+	Type_value = map[string]int32{
 		"TYPE_INDUSTRY_UNSPECIFIED": 0,
 		"TYPE_SCIENCE":              1,
 		"TYPE_FILM":                 2,
@@ -48,30 +48,30 @@ var (
 	}
 )
 
-func (x TYPE) Enum() *TYPE {
-	p := new(TYPE)
+func (x Type) Enum() *Type {
+	p := new(Type)
 	*p = x
 	return p
 }
 
-func (x TYPE) String() string {
+func (x Type) String() string {
 	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
 }
 
-func (TYPE) Descriptor() protoreflect.EnumDescriptor {
+func (Type) Descriptor() protoreflect.EnumDescriptor {
 	return file_news_news_v1_news_proto_enumTypes[0].Descriptor()
 }
 
-func (TYPE) Type() protoreflect.EnumType {
+func (Type) Type() protoreflect.EnumType {
 	return &file_news_news_v1_news_proto_enumTypes[0]
 }
 
-func (x TYPE) Number() protoreflect.EnumNumber {
+func (x Type) Number() protoreflect.EnumNumber {
 	return protoreflect.EnumNumber(x)
 }
 
-// Deprecated: Use TYPE.Descriptor instead.
-func (TYPE) EnumDescriptor() ([]byte, []int) {
+// Deprecated: Use Type.Descriptor instead.
+func (Type) EnumDescriptor() ([]byte, []int) {
 	return file_news_news_v1_news_proto_rawDescGZIP(), []int{0}
 }
 
@@ -91,7 +91,7 @@ type News struct {
 	View      int32                  `protobuf:"varint,9,opt,name=view,proto3" json:"view,omitempty"`
 	Comment   int32                  `protobuf:"varint,10,opt,name=comment,proto3" json:"comment,omitempty"`
 	// 1: 业界, 2: 科学, 3: 影视, 4: 游戏
-	Type TYPE `protobuf:"varint,11,opt,name=type,proto3,enum=news.news.v1.TYPE" json:"type,omitempty"`
+	Type Type `protobuf:"varint,11,opt,name=type,proto3,enum=news.news.v1.Type" json:"type,omitempty"`
 }
 
 func (x *News) Reset() {
@@ -196,11 +196,11 @@ func (x *News) GetComment() int32 {
 	return 0
 }
 
-func (x *News) GetType() TYPE {
+func (x *News) GetType() Type {
 	if x != nil {
 		return x.Type
 	}
-	return TYPE_TYPE_INDUSTRY_UNSPECIFIED
+	return Type_TYPE_INDUSTRY_UNSPECIFIED
 }
 
 type ListRequest struct {
@@ -583,7 +583,7 @@ var file_news_news_v1_news_proto_rawDesc = []byte{
 	0x6d, 0x6d, 0x65, 0x6e, 0x74, 0x18, 0x0a, 0x20, 0x01, 0x28, 0x05, 0x52, 0x07, 0x63, 0x6f, 0x6d,
 	0x6d, 0x65, 0x6e, 0x74, 0x12, 0x26, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x0b, 0x20, 0x01,
 	0x28, 0x0e, 0x32, 0x12, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x6e, 0x65, 0x77, 0x73, 0x2e, 0x76,
-	0x31, 0x2e, 0x54, 0x59, 0x50, 0x45, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x3a, 0x03, 0xd0, 0x3f,
+	0x31, 0x2e, 0x54, 0x79, 0x70, 0x65, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x3a, 0x03, 0xd0, 0x3f,
 	0x01, 0x22, 0x0d, 0x0a, 0x0b, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
 	0x22, 0x36, 0x0a, 0x0c, 0x4c, 0x69, 0x73, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
 	0x12, 0x26, 0x0a, 0x04, 0x6c, 0x69, 0x73, 0x74, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x12,
@@ -636,8 +636,8 @@ var file_news_news_v1_news_proto_rawDesc = []byte{
 	0x6e, 0x65, 0x77, 0x73, 0x5f, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x49, 0x44, 0x18, 0x07, 0x20,
 	0x01, 0x28, 0x0d, 0x52, 0x0c, 0x6e, 0x65, 0x77, 0x73, 0x44, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x49,
 	0x44, 0x3a, 0x03, 0xd0, 0x3f, 0x01, 0x3a, 0x12, 0xd0, 0x3f, 0x01, 0xe2, 0x3f, 0x0c, 0x6e, 0x65,
-	0x77, 0x73, 0x5f, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x2a, 0x55, 0x0a, 0x04, 0x54, 0x59,
-	0x50, 0x45, 0x12, 0x1d, 0x0a, 0x19, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x49, 0x4e, 0x44, 0x55, 0x53,
+	0x77, 0x73, 0x5f, 0x64, 0x65, 0x74, 0x61, 0x69, 0x6c, 0x73, 0x2a, 0x55, 0x0a, 0x04, 0x54, 0x79,
+	0x70, 0x65, 0x12, 0x1d, 0x0a, 0x19, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x49, 0x4e, 0x44, 0x55, 0x53,
 	0x54, 0x52, 0x59, 0x5f, 0x55, 0x4e, 0x53, 0x50, 0x45, 0x43, 0x49, 0x46, 0x49, 0x45, 0x44, 0x10,
 	0x00, 0x12, 0x10, 0x0a, 0x0c, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x53, 0x43, 0x49, 0x45, 0x4e, 0x43,
 	0x45, 0x10, 0x01, 0x12, 0x0d, 0x0a, 0x09, 0x54, 0x59, 0x50, 0x45, 0x5f, 0x46, 0x49, 0x4c, 0x4d,
@@ -680,7 +680,7 @@ func file_news_news_v1_news_proto_rawDescGZIP() []byte {
 var file_news_news_v1_news_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_news_news_v1_news_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_news_news_v1_news_proto_goTypes = []interface{}{
-	(TYPE)(0),                            // 0: news.news.v1.TYPE
+	(Type)(0),                            // 0: news.news.v1.Type
 	(*News)(nil),                         // 1: news.news.v1.News
 	(*ListRequest)(nil),                  // 2: news.news.v1.ListRequest
 	(*ListResponse)(nil),                 // 3: news.news.v1.ListResponse
@@ -694,7 +694,7 @@ var file_news_news_v1_news_proto_depIdxs = []int32{
 	7,  // 0: news.news.v1.News.created_at:type_name -> google.protobuf.Timestamp
 	7,  // 1: news.news.v1.News.updated_at:type_name -> google.protobuf.Timestamp
 	8,  // 2: news.news.v1.News.deleted_at:type_name -> types.DeletedAt
-	0,  // 3: news.news.v1.News.type:type_name -> news.news.v1.TYPE
+	0,  // 3: news.news.v1.News.type:type_name -> news.news.v1.Type
 	1,  // 4: news.news.v1.ListResponse.list:type_name -> news.news.v1.News
 	7,  // 5: news.news.v1.DetailResponse.created_at:type_name -> google.protobuf.Timestamp
 	7,  // 6: news.news.v1.DetailResponse.updated_at:type_name -> google.protobuf.Timestamp

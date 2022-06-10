@@ -31,7 +31,7 @@ type NewsGORM struct {
 	View    int32
 	Comment int32
 	// 1: 业界, 2: 科学, 3: 影视, 4: 游戏
-	Type      TYPE
+	Type      Type
 	CreatedAt *time.Time
 	UpdatedAt *time.Time
 	DeletedAt *types.DeletedAt `gorm:"index"`
