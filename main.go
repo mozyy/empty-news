@@ -71,6 +71,8 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 	// if !valid(md["authorization"]) {
 	// 	return nil, errInvalidToken
 	// }
+	log.Printf("%s\n", info.FullMethod)
+
 	start := time.Now()
 	var handler grpc.UnaryHandler = func(ctx context.Context, req interface{}) (interface{}, error) {
 		result, err := handlers(ctx, req)
@@ -82,16 +84,6 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 			}
 		}
 		return result, err
-	}
-	apiScopes := []string{}
-	for _, api := range *conf.Apis {
-		if api.Api == info.FullMethod {
-			// 接口配置了public: 公共接口
-			if api.Scope == "public" {
-				return handler(ctx, req)
-			}
-			apiScopes = append(apiScopes, api.Scope)
-		}
 	}
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
@@ -122,7 +114,7 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 		return nil, uerrors.ErrInvalidToken
 	}
 
-	return nil, uerrors.ErrPermissionDenied
+	return handler(ctx, req)
 }
 
 func register(grpcServer *grpc.Server) {
