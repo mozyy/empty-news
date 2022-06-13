@@ -13,10 +13,10 @@ import (
 
 type User struct {
 	user *UserStore
-	loginv1.UnimplementedUserServiceServer
+	loginv1.UnimplementedLoginServiceServer
 }
 
-func New() loginv1.UserServiceServer {
+func New() loginv1.LoginServiceServer {
 	return &User{user: NewUserStore()}
 }
 
@@ -56,9 +56,7 @@ func (a *User) Login(ctx context.Context, req *loginv1.LoginRequest) (*loginv1.L
 	log.Println(tokenInfo)
 
 	return &loginv1.LoginResponse{
-		OAuthToken: &oauthv1.TokenInfo{Access: tokenInfo.GetAccess(),
-			TokenType: tokenInfo.GetTokenType(), Refresh: tokenInfo.GetRefresh(),
-			AccessExpiresIn: tokenInfo.GetAccessExpiresIn()}}, nil
+		TokenInfo: tokenInfo}, nil
 }
 
 func (a *User) Info(_ context.Context, _ *loginv1.InfoRequest) (*loginv1.InfoResponse, error) {

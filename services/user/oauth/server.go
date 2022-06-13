@@ -27,7 +27,7 @@ func newSrv() *oauthServer {
 		manager.MapAccessGenerate(NewAccessGenerate())
 		manager.MapClientStorage(NewStoreClient())
 
-		srv := &oauthServer{
+		srv = &oauthServer{
 			Server: server.NewDefaultServer(manager),
 		}
 

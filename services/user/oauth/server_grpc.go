@@ -6,25 +6,12 @@ import (
 	"github.com/go-oauth2/oauth2/v4"
 	"github.com/go-oauth2/oauth2/v4/errors"
 	oauthv1 "github.com/mozyy/empty-news/proto/user/oauth/v1"
+	uerrors "github.com/mozyy/empty-news/utils/errors"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func NewServerGrpc() oauthv1.OAuthServiceServer {
 	return newSrv()
-}
-
-func (o *oauthServer) Authorize(ctx context.Context, req *oauthv1.AuthorizeRequest) (*oauthv1.AuthorizeResponse, error) {
-	// serReq := &server.AuthorizeRequest{
-	// 	RedirectURI:  req.GetRedirectURI(),
-	// 	ResponseType: oauth2.ResponseType(req.GetResponseType()),
-	// 	ClientID:     req.GetClientID(),
-	// 	State:        req.GetState(),
-	// 	Scope:        req.GetScope(),
-	// 	// Request:             r,
-	// 	CodeChallenge:       req.GetCodeChallenge(),
-	// 	CodeChallengeMethod: oauth2.CodeChallengeMethod(req.GetCodeChallengeMethod()),
-	// }
-	return nil, nil
 }
 
 func (o *oauthServer) Token(ctx context.Context, req *oauthv1.TokenRequest) (*oauthv1.TokenResponse, error) {
@@ -60,6 +47,14 @@ func (o *oauthServer) Token(ctx context.Context, req *oauthv1.TokenRequest) (*oa
 		},
 	}
 	return res, nil
+}
+
+func (o *oauthServer) Valid(ctx context.Context, req *oauthv1.ValidRequest) (*oauthv1.ValidResponse, error) {
+	claims, err := ValidToken(req.GetAccess())
+	if err != nil || claims.Valid() != nil {
+		return nil, uerrors.ErrInvalidToken
+	}
+	return &oauthv1.ValidResponse{Scope: claims.Scope}, nil
 }
 
 // ValidationTokenRequest the token request validation

@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type OAuthServiceClient interface {
 	//
 	Token(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenResponse, error)
+	Valid(ctx context.Context, in *ValidRequest, opts ...grpc.CallOption) (*ValidResponse, error)
 }
 
 type oAuthServiceClient struct {
@@ -43,12 +44,22 @@ func (c *oAuthServiceClient) Token(ctx context.Context, in *TokenRequest, opts .
 	return out, nil
 }
 
+func (c *oAuthServiceClient) Valid(ctx context.Context, in *ValidRequest, opts ...grpc.CallOption) (*ValidResponse, error) {
+	out := new(ValidResponse)
+	err := c.cc.Invoke(ctx, "/user.oauth.v1.OAuthService/Valid", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // OAuthServiceServer is the server API for OAuthService service.
 // All implementations must embed UnimplementedOAuthServiceServer
 // for forward compatibility
 type OAuthServiceServer interface {
 	//
 	Token(context.Context, *TokenRequest) (*TokenResponse, error)
+	Valid(context.Context, *ValidRequest) (*ValidResponse, error)
 	mustEmbedUnimplementedOAuthServiceServer()
 }
 
@@ -58,6 +69,9 @@ type UnimplementedOAuthServiceServer struct {
 
 func (UnimplementedOAuthServiceServer) Token(context.Context, *TokenRequest) (*TokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Token not implemented")
+}
+func (UnimplementedOAuthServiceServer) Valid(context.Context, *ValidRequest) (*ValidResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Valid not implemented")
 }
 func (UnimplementedOAuthServiceServer) mustEmbedUnimplementedOAuthServiceServer() {}
 
@@ -90,6 +104,24 @@ func _OAuthService_Token_Handler(srv interface{}, ctx context.Context, dec func(
 	return interceptor(ctx, in, info, handler)
 }
 
+func _OAuthService_Valid_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ValidRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(OAuthServiceServer).Valid(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.oauth.v1.OAuthService/Valid",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(OAuthServiceServer).Valid(ctx, req.(*ValidRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // OAuthService_ServiceDesc is the grpc.ServiceDesc for OAuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -100,6 +132,10 @@ var OAuthService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Token",
 			Handler:    _OAuthService_Token_Handler,
+		},
+		{
+			MethodName: "Valid",
+			Handler:    _OAuthService_Valid_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -2,12 +2,11 @@
 // versions:
 // 	protoc-gen-gorm v2.0.0
 // 	protoc        (unknown)
-// source: sms/sms/v1/sms.proto
+// source: system/resource/v1/api.proto
 
-package smsv1
+package resourcev1
 
 import (
-	_ "github.com/mozyy/protoc-gen-gorm/options"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 )
 

@@ -14,6 +14,7 @@ import (
 	resourcev1 "github.com/mozyy/empty-news/proto/system/resource/v1"
 	loginv1 "github.com/mozyy/empty-news/proto/user/login/v1"
 	oauthv1 "github.com/mozyy/empty-news/proto/user/oauth/v1"
+	"github.com/mozyy/empty-news/services/client"
 	"github.com/mozyy/empty-news/services/conf"
 	"github.com/mozyy/empty-news/services/news"
 	"github.com/mozyy/empty-news/services/system/resource"
@@ -102,26 +103,25 @@ func ensureValidToken(ctx context.Context, req interface{}, info *grpc.UnaryServ
 		return nil, uerrors.ErrInvalidToken
 	}
 	access := strings.TrimSpace(strings.TrimPrefix(authorization[0], "Bearer"))
+	conn, err := client.Conn()
+	if err != nil {
+		return nil, uerrors.ErrPermissionDenied
+	}
+	defer conn.Close()
+	clientOauth := oauthv1.NewOAuthServiceClient(conn)
+	res, err := clientOauth.Valid(ctx, &oauthv1.ValidRequest{Access: access})
+	if err != nil {
+		return nil, uerrors.ErrPermissionDenied
+	}
+	clientApiAuth := resourcev1.NewApiAuthServiceClient(conn)
+	scopes := strings.Split(res.GetScope(), " ")
 
-	claims, err := oauth.ValidToken(access)
+	_, err = clientApiAuth.Valid(ctx, &resourcev1.ValidRequest{Scopes: scopes})
 
-	if err != nil || claims.Valid() != nil {
+	if err != nil {
 		return nil, uerrors.ErrInvalidToken
 	}
 
-	scopeStr := claims.Scope
-	userScopes := strings.Split(scopeStr, " ")
-	for _, us := range userScopes {
-		// 用户admin: 超级管理员
-		if us == "admin" {
-			return handler(ctx, req)
-		}
-		for _, as := range apiScopes {
-			if us == as {
-				return handler(ctx, req)
-			}
-		}
-	}
 	return nil, uerrors.ErrPermissionDenied
 }
 
@@ -129,7 +129,9 @@ func register(grpcServer *grpc.Server) {
 	// Register handler
 	newsv1.RegisterNewsServiceServer(grpcServer, news.New())
 	// pbuser.RegisterUserServer(grpcServer, user.New())
-	loginv1.RegisterUserServiceServer(grpcServer, login.New())
-	resourcev1.RegisterResourceServiceServer(grpcServer, resource.New())
+	loginv1.RegisterLoginServiceServer(grpcServer, login.New())
+	resourceNew := resource.New()
+	resourcev1.RegisterResourceServiceServer(grpcServer, resourceNew)
+	resourcev1.RegisterApiAuthServiceServer(grpcServer, resourceNew)
 	oauthv1.RegisterOAuthServiceServer(grpcServer, oauth.NewServerGrpc())
 }
