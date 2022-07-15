@@ -63,9 +63,15 @@ static_resources:
 
 
           http_filters:
-          - name: envoy.filters.http.grpc_web
-          - name: envoy.filters.http.cors
-          - name: envoy.filters.http.router
+            - name: envoy.filters.http.grpc_web
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.grpc_web.v3.GrpcWeb
+            - name: envoy.filters.http.cors
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.cors.v3.Cors
+            - name: envoy.filters.http.router
+              typed_config:
+                "@type": type.googleapis.com/envoy.extensions.filters.http.router.v3.Router
   clusters:
   - name: interop_service
     connect_timeout: 0.25s
@@ -79,7 +85,7 @@ static_resources:
             - endpoint:
                 address:
                   socket_address:
-                    address: 192.168.120.100
+                    address: empty-news
                     port_value: 50051
   - name: interop_service_gateway
     connect_timeout: 0.25s
@@ -93,7 +99,7 @@ static_resources:
             - endpoint:
                 address:
                   socket_address:
-                    address: 192.168.120.100
+                    address: empty-news
                     port_value: 50061
   - name: interop_oauth2
     connect_timeout: 0.25s
@@ -107,5 +113,5 @@ static_resources:
             - endpoint:
                 address:
                   socket_address:
-                    address: 192.168.120.100
+                    address: empty-news
                     port_value: 9096
