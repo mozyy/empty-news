@@ -1,0 +1,50 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.166.1/containers/docker-from-docker-compose
+{
+  "name": "EmptyNews",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "empty-news",
+  "workspaceFolder": "/workspace",
+
+  // "image": "mozyy/empty-dev-container:1.0.9",
+  // "runArgs": ["--init", "--name", "empty-news"],
+  // "mounts": [
+  //   "source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+  // ],
+  // "overrideCommand": false,
+
+  // Use this environment variable if you need to bind mount your local source code into a new container.
+  "remoteEnv": {
+    // "LOCAL_WORKSPACE_FOLDER": "${localWorkspaceFolder}",
+    "http_proxy": "${localEnv:proxy_addr}",
+    "https_proxy": "${localEnv:proxy_addr}",
+    "mysql_dsn": "${localEnv:mysql_dsn}"
+    // "postgresql_dsn": "${localEnv:postgresql_dsn}"
+  },
+  // Set *default* container specific settings.json values on container create.
+  "settings": {
+    "terminal.integrated.profiles.linux": {
+      "zsh (login)": {
+        "path": "zsh",
+        "args": ["-l"]
+      }
+    },
+    "go.toolsManagement.checkForUpdates": "local",
+    "go.useLanguageServer": true,
+    "go.gopath": "/go"
+    // "go.goroot": "/usr/local/go"
+  },
+  // Add the IDs of extensions you want installed when the container is created.
+  "extensions": [
+    "ms-azuretools.vscode-docker",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "golang.Go"
+  ],
+  // Use 'forwardPorts' to make a list of ports inside the container available locally.
+  "forwardPorts": [9901, 50052]
+  // Use 'postCreateCommand' to run commands after the container is created.
+  // "postCreateCommand": "go version",
+  // Comment out connect as root instead. More info: https://aka.ms/vscode-remote/containers/non-root.
+  // "remoteUser": "root"
+}
