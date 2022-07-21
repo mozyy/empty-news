@@ -1,0 +1,8 @@
+FROM envoyproxy/envoy:v1.22-latest
+
+COPY envoy.yaml /etc/envoy/envoy.yaml
+
+CMD /usr/local/bin/envoy -c /etc/envoy/envoy.yaml -l trace --log-path /tmp/envoy_info.log
+
+# docker build -t empty-news_envoy -f Dockerfile.envoy .
+# docker run -p 50052:50052 -p 9902:9902 -d --name empty-news_envoy --link empty-news empty-news_envoy
