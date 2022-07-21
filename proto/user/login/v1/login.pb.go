@@ -146,7 +146,7 @@ type LoginRequest struct {
 
 	// 手机号
 	Mobile string `protobuf:"bytes,1,opt,name=mobile,proto3" json:"mobile,omitempty"`
-	// 密码2
+	// 密码
 	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
 	// 短信验证码
 	SmsCode string `protobuf:"bytes,3,opt,name=sms_code,json=smsCode,proto3" json:"sms_code,omitempty"`
